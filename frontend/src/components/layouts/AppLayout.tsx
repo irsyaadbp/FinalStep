@@ -123,8 +123,8 @@ export default function AppLayout() {
       </nav>
 
       {/* Main Content */}
-      <main className="flex-1 md:ml-[72px] pb-24 md:pb-0 overflow-x-hidden">
-        <div className="mx-auto max-w-[900px] p-4 md:p-6 overflow-x-hidden">
+      <main className="flex-1 md:ml-[72px] pb-24 md:pb-0">
+        <div className="mx-auto max-w-[900px] p-4 md:p-6">
           <Outlet />
         </div>
       </main>
