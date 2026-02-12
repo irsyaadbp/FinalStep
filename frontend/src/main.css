@@ -1,0 +1,162 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap");
+
+@import "tailwindcss";
+
+@theme {
+  --color-background: hsl(0 0% 97%);
+  --color-foreground: hsl(220 20% 10%);
+
+  --color-card: hsl(0 0% 100%);
+  --color-card-foreground: hsl(220 20% 10%);
+
+  --color-popover: hsl(0 0% 100%);
+  --color-popover-foreground: hsl(220 20% 10%);
+
+  --color-primary: hsl(252 60% 50%);
+  --color-primary-foreground: hsl(0 0% 100%);
+
+  --color-secondary: hsl(220 14% 96%);
+  --color-secondary-foreground: hsl(220 20% 15%);
+
+  --color-muted: hsl(220 14% 96%);
+  --color-muted-foreground: hsl(220 10% 50%);
+
+  --color-accent: hsl(252 60% 50%);
+  --color-accent-foreground: hsl(0 0% 100%);
+
+  --color-destructive: hsl(0 84% 60%);
+  --color-destructive-foreground: hsl(0 0% 100%);
+
+  --color-border: hsl(220 13% 91%);
+  --color-input: hsl(220 13% 91%);
+  --color-ring: hsl(252 60% 50%);
+
+  --radius: 0.75rem;
+
+  --shadow-card:
+    0 0 0 1px hsl(220 13% 91%), 0 1px 2px 0 hsl(220 20% 10% / 0.03);
+
+  --shadow-elevated:
+    0 0 0 1px hsl(220 13% 91%), 0 4px 16px -4px hsl(220 20% 10% / 0.08);
+
+  /* extra tokens */
+  --color-xp: hsl(36 100% 50%);
+  --color-streak: hsl(15 90% 55%);
+  --color-level: hsl(258 60% 55%);
+  --color-success: hsl(142 71% 45%);
+  --color-success-foreground: hsl(0 0% 100%);
+
+  /* sidebar */
+  --color-sidebar-background: hsl(0 0% 100%);
+  --color-sidebar-foreground: hsl(220 10% 40%);
+  --color-sidebar-primary: hsl(258 60% 55%);
+  --color-sidebar-primary-foreground: hsl(0 0% 100%);
+  --color-sidebar-accent: hsl(220 14% 96%);
+  --color-sidebar-accent-foreground: hsl(220 20% 10%);
+  --color-sidebar-border: hsl(220 13% 91%);
+  --color-sidebar-ring: hsl(252 60% 50%);
+}
+
+.dark {
+  --color-background: hsl(222 47% 6%);
+  --color-foreground: hsl(210 40% 96%);
+  --color-card: hsl(222 47% 9%);
+  --color-card-foreground: hsl(210 40% 96%);
+  --color-popover: hsl(222 47% 9%);
+  --color-popover-foreground: hsl(210 40% 96%);
+  --color-primary: hsl(252 60% 50%);
+  --color-primary-foreground: hsl(0 0% 100%);
+  --color-secondary: hsl(217 33% 17%);
+  --color-secondary-foreground: hsl(210 40% 96%);
+  --color-muted: hsl(217 33% 17%);
+  --color-muted-foreground: hsl(215 20% 65%);
+  --color-accent: hsl(252 60% 50%);
+  --color-accent-foreground: hsl(0 0% 100%);
+  --color-destructive: hsl(0 63% 31%);
+  --color-destructive-foreground: hsl(210 40% 98%);
+  --color-border: hsl(217 33% 17%);
+  --color-input: hsl(217 33% 17%);
+  --color-ring: hsl(252 60% 50%);
+  --color-sidebar-background: hsl(222 47% 9%);
+  --color-sidebar-foreground: hsl(210 40% 96%);
+  --color-sidebar-primary: hsl(258 60% 55%);
+  --color-sidebar-primary-foreground: hsl(0 0% 100%);
+  --color-sidebar-accent: hsl(217 33% 17%);
+  --color-sidebar-accent-foreground: hsl(210 40% 96%);
+  --color-sidebar-border: hsl(217 33% 17%);
+  --color-sidebar-ring: hsl(252 60% 50%);
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-family: "Inter", system-ui, sans-serif;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: "Plus Jakarta Sans", "Inter", system-ui, sans-serif;
+  }
+}
+
+@layer utilities {
+  .shadow-card {
+    box-shadow: var(--shadow-card);
+  }
+
+  .shadow-elevated {
+    box-shadow: var(--shadow-elevated);
+  }
+
+  .prose-content {
+    @apply leading-relaxed;
+  }
+
+  .prose-content h1 {
+    @apply text-3xl font-bold mb-4 mt-8;
+  }
+
+  .prose-content h2 {
+    @apply text-2xl font-semibold mb-3 mt-6;
+  }
+
+  .prose-content h3 {
+    @apply text-xl font-semibold mb-2 mt-5;
+  }
+
+  .prose-content p {
+    @apply mb-4 text-muted-foreground leading-7;
+  }
+
+  .prose-content ul {
+    @apply list-disc pl-6 mb-4 space-y-1;
+  }
+
+  .prose-content ol {
+    @apply list-decimal pl-6 mb-4 space-y-1;
+  }
+
+  .prose-content li {
+    @apply text-muted-foreground leading-7;
+  }
+
+  .prose-content code {
+    @apply bg-muted px-1.5 py-0.5 rounded text-sm font-mono;
+  }
+
+  .prose-content pre {
+    @apply bg-muted p-4 rounded-lg overflow-x-auto mb-4;
+  }
+
+  .prose-content blockquote {
+    @apply border-l-4 border-primary pl-4 italic text-muted-foreground my-4;
+  }
+}
