@@ -1,4 +1,3 @@
-
 import { createBrowserRouter } from "react-router";
 import RootLayout from "./components/layouts/RootLayout";
 import AuthLayout from "./components/layouts/AuthLayout";
@@ -26,46 +25,59 @@ import StudentsPage from "./pages/dashboard/students/StudentsPage";
 import SettingsPage from "./pages/dashboard/settings/SettingsPage";
 
 export const router = createBrowserRouter([
-    {
-        path: "/",
-        element: <RootLayout />,
+  {
+    path: "/",
+    element: <RootLayout />,
+    children: [
+      // Auth Routes (Public)
+      {
+        element: <AuthLayout />,
         children: [
-            // Auth Routes (Public)
-            {
-                element: <AuthLayout />,
-                children: [
-                    { path: "login", element: <LoginPage /> },
-                    { path: "register", element: <RegisterPage /> },
-                ],
-            },
-            
-            // App Routes (Protected)
-            {
-                element: <ProtectedRoute><AppLayout /></ProtectedRoute>,
-                children: [
-                    { index: true, element: <AppIndexPage /> },
-                    { path: "subjects", element: <AppSubjectsPage /> },
-                    { path: "subjects/:slug", element: <AppSubjectDetailPage /> },
-                    { path: "quizzes", element: <AppQuizzesPage /> },
-                    { path: "profile", element: <AppProfilePage /> },
-                ],
-            },
-
-            // Dashboard Routes (Protected)
-            {
-                path: "dashboard",
-                element: <ProtectedRoute><DashboardLayout /></ProtectedRoute>,
-                children: [
-                    { index: true, element: <DashboardIndexPage /> },
-                    { path: "subjects", element: <DashboardSubjectsPage /> },
-                    // subjects -> [slug]/materials -> [slug]/quizzes
-                    { path: "subjects/:slug/materials", element: <DashboardMaterialsPage /> },
-                    { path: "subjects/:slug/materials/:materialSlug/quizzes", element: <DashboardQuizzesPage /> },
-                    { path: "students", element: <StudentsPage /> },
-                    { path: "settings", element: <SettingsPage /> },
-                ],
-            },
+          { path: "login", element: <LoginPage /> },
+          { path: "register", element: <RegisterPage /> },
         ],
-    },
-]);
+      },
 
+      // App Routes (Protected)
+      {
+        element: (
+          <ProtectedRoute>
+            <AppLayout />
+          </ProtectedRoute>
+        ),
+        children: [
+          { index: true, element: <AppIndexPage /> },
+          { path: "subjects", element: <AppSubjectsPage /> },
+          { path: "subjects/:slug", element: <AppSubjectDetailPage /> },
+          { path: "quizzes", element: <AppQuizzesPage /> },
+          { path: "profile", element: <AppProfilePage /> },
+        ],
+      },
+
+      // Dashboard Routes (Protected)
+      {
+        path: "dashboard",
+        element: (
+          <ProtectedRoute>
+            <DashboardLayout />
+          </ProtectedRoute>
+        ),
+        children: [
+          { index: true, element: <DashboardIndexPage /> },
+          { path: "subjects", element: <DashboardSubjectsPage /> },
+          // subjects -> [slug]/materials -> [slug]/quizzes
+          {
+            path: "subjects/:slug/materials",
+            element: <DashboardMaterialsPage />,
+          },
+          {
+            path: "subjects/:slug/materials/:materialSlug/quizzes",
+            element: <DashboardQuizzesPage />,
+          },
+          { path: "students", element: <StudentsPage /> },
+          { path: "settings", element: <SettingsPage /> },
+        ],
+      },
+    ],
+  },
+]);
