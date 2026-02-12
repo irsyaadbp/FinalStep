@@ -7,15 +7,15 @@ import {
   Target,
   User,
   Lock,
-  type LucideIcon,
 } from "lucide-react";
-import { Button } from "../../components/ui/Button";
 import { useState } from "react";
-import { Label } from "../../components/ui/Label";
-import { Input } from "../../components/ui/Input";
-import { PasswordInput } from "../../components/ui/PasswordInput";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { registerSchema, type RegisterInput } from "@finalstep/shared";
+import { FormGenerator, type FormField } from "../../components/common/FormGenerator";
+import { Button } from "../../components/ui/Button";
 
-const fields = [
+const fields: FormField<RegisterInput>[] = [
   {
     id: "name",
     label: "Nama Lengkap",
@@ -59,22 +59,33 @@ const fields = [
 ];
 
 export default function RegisterPage() {
-  const [loading] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  const [form, setForm] = useState({
-    name: "",
-    email: "",
-    password: "",
-    school: "",
-    targetUniversity: "",
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    resolver: zodResolver(registerSchema),
+    defaultValues: {
+      name: "",
+      email: "",
+      password: "",
+      school: "",
+      targetUniversity: "",
+    },
   });
 
-  const update = (field: string, value: string) =>
-    setForm({ ...form, [field]: value });
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const onSubmit = async (data: RegisterInput) => {
+    setLoading(true);
+    try {
+      // TODO: Implement registration logic
+      console.log(data);
+    } finally {
+      setLoading(false);
+    }
   };
+
   return (
     <>
         {/* Logo */}
@@ -114,36 +125,12 @@ export default function RegisterPage() {
           transition={{ delay: 0.3 }}
           className="rounded-3xl border-2 border-border bg-card p-6 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.5),0_8px_24px_0_rgba(0,0,0,0.06)]"
         >
-          <form onSubmit={handleSubmit} className="space-y-3">
-            {fields.map((f, i) => {
-              const Icon = f.icon as LucideIcon;
-              const Component = f.id === "password" ? PasswordInput : Input;
-              return (
-                <motion.div
-                  key={f.id}
-                  initial={{ opacity: 0, x: -8 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.35 + i * 0.06 }}
-                  className="space-y-1.5"
-                >
-                  <Label htmlFor={f.id} className="text-xs font-bold">
-                    {f.label}
-                  </Label>
-                  <div className="relative">
-                    <Icon className="absolute z-10 left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/40" />
-                    <Component
-                      id={f.id}
-                      type={f.id === "password" ? undefined : f.type}
-                      placeholder={f.placeholder}
-                      value={form[f.id as keyof typeof form]}
-                      onChange={(e) => update(f.id, e.target.value)}
-                      className="pl-10 h-11 rounded-xl border-2 bg-background shadow-[inset_0_2px_4px_0_rgba(0,0,0,0.04)] focus:shadow-[inset_0_2px_4px_0_rgba(0,0,0,0.04),0_0_0_3px_hsl(var(--primary)/0.12)] transition-shadow text-sm"
-                      required={f.required}
-                    />
-                  </div>
-                </motion.div>
-              );
-            })}
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+            <FormGenerator
+              fields={fields}
+              register={register}
+              errors={errors}
+            />
 
             <Button
               type="submit"

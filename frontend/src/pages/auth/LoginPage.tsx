@@ -2,20 +2,59 @@ import { Link } from "react-router";
 import { motion } from "motion/react";
 import { GraduationCap, Mail, Lock } from "lucide-react";
 import { useState } from "react";
-import { Label } from "../../components/ui/Label";
-import { Input } from "../../components/ui/Input";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { loginSchema, type LoginInput } from "@finalstep/shared";
+import {
+  FormGenerator,
+  type FormField,
+} from "../../components/common/FormGenerator";
 import { Button } from "../../components/ui/Button";
-import { PasswordInput } from "../../components/ui/PasswordInput";
+
+const fields: FormField<LoginInput>[] = [
+  {
+    id: "email",
+    label: "Email",
+    icon: Mail,
+    placeholder: "ahmad@email.com",
+    type: "email",
+    required: true,
+  },
+  {
+    id: "password",
+    label: "Password",
+    icon: Lock,
+    placeholder: "••••••••",
+    type: "password",
+    required: true,
+  },
+];
 
 export default function LoginPage() {
   const [loading, setLoading] = useState(false);
 
-  const [form, setForm] = useState({
-    email: "",
-    password: "",
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+    },
   });
 
-  function handleSubmit() {}
+  const onSubmit = async (data: LoginInput) => {
+    setLoading(true);
+    try {
+      // TODO: Implement login logic
+      console.log(data);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <>
       {/* Logo + Title */}
@@ -53,44 +92,8 @@ export default function LoginPage() {
         transition={{ delay: 0.3 }}
         className="rounded-3xl border-2 border-border bg-card p-6 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.5),0_8px_24px_0_rgba(0,0,0,0.06)]"
       >
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-1.5">
-            <Label htmlFor="email" className="text-xs font-bold">
-              Email
-            </Label>
-            <div className="relative">
-              <Mail className="absolute z-10 left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/40" />
-              <Input
-                id="email"
-                type="email"
-                placeholder="ahmad@email.com"
-                value={form.email}
-                onChange={(e) =>
-                  setForm((prev) => ({ ...prev, email: e.target.value }))
-                }
-                className="pl-10 h-12 rounded-xl border-2 bg-background shadow-[inset_0_2px_4px_0_rgba(0,0,0,0.04)] focus:shadow-[inset_0_2px_4px_0_rgba(0,0,0,0.04),0_0_0_3px_hsl(252 60% 50%/0.12)] transition-shadow"
-                required
-              />
-            </div>
-          </div>
-          <div className="space-y-1.5">
-            <Label htmlFor="password" className="text-xs font-bold">
-              Password
-            </Label>
-            <div className="relative">
-              <Lock className="absolute z-10 left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/40" />
-              <PasswordInput
-                id="password"
-                placeholder="••••••••"
-                value={form.password}
-                onChange={(e) =>
-                  setForm((prev) => ({ ...prev, password: e.target.value }))
-                }
-                className="pl-10 h-12 rounded-xl border-2 bg-background shadow-[inset_0_2px_4px_0_rgba(0,0,0,0.04)] focus:shadow-[inset_0_2px_4px_0_rgba(0,0,0,0.04),0_0_0_3px_hsl(252 60% 50%/0.12)] transition-shadow"
-                required
-              />
-            </div>
-          </div>
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          <FormGenerator fields={fields} register={register} errors={errors} />
 
           <Button
             type="submit"
@@ -101,18 +104,6 @@ export default function LoginPage() {
           </Button>
         </form>
       </motion.div>
-
-      <motion.p
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.5 }}
-        className="mt-6 text-center text-sm text-muted-foreground"
-      >
-        Belum punya akun?{" "}
-        <Link to="/register" className="font-bold text-primary hover:underline">
-          Daftar Sekarang
-        </Link>
-      </motion.p>
     </>
   );
 }
