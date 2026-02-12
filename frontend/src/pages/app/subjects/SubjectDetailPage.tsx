@@ -80,12 +80,15 @@ export default function SubjectDetailPage() {
       <div className="flex-1">
         {/* Header */}
         <div className="flex items-center gap-3 mb-6">
-          <button
-            onClick={() => navigate(-1)}
-            className="flex h-10 w-10 items-center justify-center rounded-xl border-2 border-border bg-card shadow-[inset_0_1px_0_0_rgba(255,255,255,0.5),0_2px_4px_0_rgba(0,0,0,0.04)] hover:bg-secondary transition-colors shrink-0"
+          <Button
+            variant="card"
+            size="icon"
+            onClick={() => navigate('/subjects')}
+            className="rounded-xl shrink-0"
           >
             <ChevronLeft className="h-5 w-5" />
-          </button>
+          </Button>
+
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2">
               <span className="text-2xl">{subject.icon}</span>

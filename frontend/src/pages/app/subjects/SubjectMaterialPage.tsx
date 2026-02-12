@@ -182,12 +182,14 @@ export default function SubjectMaterialPage() {
           >
             <div className="mx-auto max-w-225 px-4 pt-6">
               <div className="flex items-center gap-3 mb-6">
-                <button
+                <Button
+                  variant="card"
+                  size="icon"
                   onClick={handleBackToSyllabus}
-                  className="flex h-10 w-10 items-center justify-center rounded-xl border-2 border-border bg-card shadow-[inset_0_1px_0_0_rgba(255,255,255,0.5),0_2px_4px_0_rgba(0,0,0,0.04)] hover:bg-secondary transition-colors shrink-0"
+                  className="rounded-xl shrink-0"
                 >
                   <ChevronLeft className="h-5 w-5" />
-                </button>
+                </Button>
                 <div className="flex-1 min-w-0">
                   <p className="text-xs text-muted-foreground">
                     {subject.icon} {subject.title}
@@ -218,12 +220,14 @@ export default function SubjectMaterialPage() {
           >
             <div className="mx-auto max-w-225 px-4 pt-6">
               <div className="flex items-center gap-3 mb-6">
-                <button
+                <Button
+                  variant="card"
+                  size="icon"
                   onClick={viewMode === "quiz" ? () => setViewMode("reading") : handleBackToSyllabus}
-                  className="flex h-10 w-10 items-center justify-center rounded-xl border-2 border-border bg-card shadow-[inset_0_1px_0_0_rgba(255,255,255,0.5),0_2px_4px_0_rgba(0,0,0,0.04)] hover:bg-secondary transition-colors shrink-0"
+                  className="rounded-xl shrink-0"
                 >
                   <ChevronLeft className="h-5 w-5" />
-                </button>
+                </Button>
                 <div className="flex-1 min-w-0">
                   <p className="text-xs text-muted-foreground">
                     {subject.icon} {subject.title}
