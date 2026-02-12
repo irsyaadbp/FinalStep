@@ -14,7 +14,6 @@ import AppIndexPage from "./pages/app/IndexPage";
 import AppSubjectsPage from "./pages/app/subjects/SubjectsPage";
 import AppSubjectDetailPage from "./pages/app/subjects/SubjectDetailPage";
 import AppSubjectMaterialPage from "./pages/app/subjects/SubjectMaterialPage";
-import AppQuizzesPage from "./pages/app/quizzes/QuizzesPage";
 import AppProfilePage from "./pages/app/profile/ProfilePage";
 
 // Dashboard Pages
@@ -50,7 +49,6 @@ export const router = createBrowserRouter([
           { index: true, element: <AppIndexPage /> },
           { path: "subjects", element: <AppSubjectsPage /> },
           { path: "subjects/:slug", element: <AppSubjectDetailPage /> },
-          { path: "quizzes", element: <AppQuizzesPage /> },
           { path: "profile", element: <AppProfilePage /> },
         ],
       },

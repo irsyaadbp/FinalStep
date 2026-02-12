@@ -271,6 +271,7 @@ export const finalExams = [
     subjectId: "math",
     title: "Ujian Akhir Matematika",
     passed: false,
+    duration: 30, // minutes
     questions: [
       {
         id: "fq1",
@@ -303,6 +304,7 @@ export const finalExams = [
     subjectId: "physics",
     title: "Ujian Akhir Fisika",
     passed: false,
+    duration: 30,
     questions: [
       {
         id: "fq1",
@@ -328,6 +330,7 @@ export const finalExams = [
     subjectId: "chemistry",
     title: "Ujian Akhir Kimia",
     passed: false,
+    duration: 20,
     questions: [
       {
         id: "fq1",
@@ -347,6 +350,7 @@ export const finalExams = [
     subjectId: "biology",
     title: "Ujian Akhir Biologi",
     passed: false,
+    duration: 25,
     questions: [
       {
         id: "fq1",
@@ -361,6 +365,7 @@ export const finalExams = [
     subjectId: "english",
     title: "Final Exam English",
     passed: false,
+    duration: 15,
     questions: [
       {
         id: "fq1",
@@ -380,6 +385,7 @@ export const finalExams = [
     subjectId: "indonesian",
     title: "Ujian Akhir Bahasa Indonesia",
     passed: false,
+    duration: 20,
     questions: [
       {
         id: "fq1",

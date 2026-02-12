@@ -15,7 +15,7 @@
   --color-primary: hsl(252 60% 50%);
   --color-primary-foreground: hsl(0 0% 100%);
 
-  --color-secondary: hsl(220 14% 96%);
+  --color-secondary: hsl(0, 0%, 90%);
   --color-secondary-foreground: hsl(220 20% 15%);
 
   --color-muted: hsl(220 14% 96%);
@@ -92,9 +92,15 @@
     @apply border-border;
   }
 
+  html {
+    @apply h-full tabular-nums;
+  }
+
   body {
-    @apply bg-background text-foreground antialiased;
+    @apply min-h-full bg-background text-foreground antialiased overflow-x-hidden;
     font-family: "Inter", system-ui, sans-serif;
+    touch-action: manipulation;
+    overflow-y: auto !important;
   }
 
   h1,
