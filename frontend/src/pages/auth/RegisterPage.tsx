@@ -52,7 +52,7 @@ const fields: FormField<RegisterInput>[] = [
     id: "targetUniversity",
     label: "Universitas Impian",
     icon: Target,
-    placeholder: "Universitas Indonesia",
+    placeholder: "Universitas Bina Nusantara",
     type: "text",
     required: false,
   },
