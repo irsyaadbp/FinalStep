@@ -1,12 +1,16 @@
 import { motion } from "motion/react";
 import { Link } from "react-router";
 import { Card, CardContent } from "../ui/Card";
+import { BookOpen } from "lucide-react";
 
 export interface Subject {
-  id: number;
+  id: number | string;
+  slug: string;
   title: string;
   progress: number;
   icon: string;
+  totalChapters?: number;
+  completedChapters?: number;
 }
 
 interface SubjectCardProps {
@@ -28,7 +32,7 @@ export function SubjectCard({ subject, index }: SubjectCardProps) {
       transition={{ delay: 0.15 + index * 0.04 }}
       className="snap-start shrink-0"
     >
-      <Link to={`/material/${subject.id}`}>
+      <Link to={`/subjects/${subject.slug}`}>
         <Card
           className={`shadow-card hover:shadow-elevated transition-all cursor-pointer ${
             isComplete ? "border-success/30" : ""
@@ -67,9 +71,18 @@ export function SubjectCard({ subject, index }: SubjectCardProps) {
               </svg>
               <div className="absolute text-2xl">{subject.icon}</div>
             </div>
-            <p className="text-xs font-semibold text-center leading-tight line-clamp-2">
-              {subject.title}
-            </p>
+            <div className="text-center w-full">
+              <p className="text-xs font-semibold text-center leading-tight line-clamp-2">
+                {subject.title}
+              </p>
+              {subject.totalChapters !== undefined &&
+                subject.completedChapters !== undefined && (
+                  <p className="text-[10px] text-muted-foreground mt-1 flex items-center justify-center gap-1">
+                    <BookOpen className="h-2.5 w-2.5" />
+                    {subject.completedChapters}/{subject.totalChapters} Bab
+                  </p>
+                )}
+            </div>
             <span
               className={`text-[10px] font-bold ${
                 isComplete ? "text-success" : "text-muted-foreground"

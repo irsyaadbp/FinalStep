@@ -26,14 +26,14 @@ export default function IndexPage() {
   const timeProgress = 30;
 
   const subjects = [
-    { id: 1, title: "Matematika", progress: 75, icon: "📐" },
-    { id: 2, title: "Fisika", progress: 45, icon: "⚡" },
-    { id: 3, title: "Kimia", progress: 30, icon: "🧪" },
-    { id: 4, title: "Biologi", progress: 90, icon: "🧬" },
-    { id: 5, title: "Bahasa Indonesia", progress: 100, icon: "🇮🇩" },
-    { id: 6, title: "Bahasa Inggris", progress: 60, icon: "🇬🇧" },
-    { id: 7, title: "Sejarah", progress: 20, icon: "📜" },
-    { id: 8, title: "Geografi", progress: 10, icon: "🌍" },
+    { id: 'math', slug: 'math', title: "Matematika", progress: 75, icon: "📐" },
+    { id: 'physics', slug: 'physics', title: "Fisika", progress: 45, icon: "⚡" },
+    { id: 'chemistry', slug: 'chemistry', title: "Kimia", progress: 30, icon: "🧪" },
+    { id: 'biology', slug: 'biology', title: "Biologi", progress: 90, icon: "🧬" },
+    { id: 'indonesian', slug: 'indonesian', title: "Bahasa Indonesia", progress: 100, icon: "🇮🇩" },
+    { id: 'english', slug: 'english', title: "Bahasa Inggris", progress: 60, icon: "🇬🇧" },
+    { id: 'history', slug: 'history', title: "Sejarah", progress: 20, icon: "📜" },
+    { id: 'geography', slug: 'geography', title: "Geografi", progress: 10, icon: "🌍" },
   ];
 
   return (

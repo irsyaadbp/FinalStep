@@ -13,6 +13,7 @@ import RegisterPage from "./pages/auth/RegisterPage";
 import AppIndexPage from "./pages/app/IndexPage";
 import AppSubjectsPage from "./pages/app/subjects/SubjectsPage";
 import AppSubjectDetailPage from "./pages/app/subjects/SubjectDetailPage";
+import AppSubjectMaterialPage from "./pages/app/subjects/SubjectMaterialPage";
 import AppQuizzesPage from "./pages/app/quizzes/QuizzesPage";
 import AppProfilePage from "./pages/app/profile/ProfilePage";
 
@@ -53,6 +54,18 @@ export const router = createBrowserRouter([
           { path: "profile", element: <AppProfilePage /> },
         ],
       },
+
+      // Standalone Material Route (Full Page)
+      // This handles both Chapters (reading/quiz) and Final Exams
+      {
+        path: "subjects/:slug/material/:materialId",
+        element: (
+          <ProtectedRoute>
+            <AppSubjectMaterialPage />
+          </ProtectedRoute>
+        ),
+      },
+
 
       // Dashboard Routes (Protected)
       {
