@@ -1,4 +1,3 @@
-import { Link } from "react-router";
 import { motion } from "motion/react";
 import { GraduationCap, Mail, Lock } from "lucide-react";
 import { useState } from "react";
@@ -10,6 +9,7 @@ import {
   type FormField,
 } from "../../components/common/FormGenerator";
 import { Button } from "../../components/ui/Button";
+import { Link } from "react-router";
 
 const fields: FormField<LoginInput>[] = [
   {
@@ -104,6 +104,18 @@ export default function LoginPage() {
           </Button>
         </form>
       </motion.div>
+
+      <motion.p
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.6 }}
+        className="mt-6 text-center text-sm text-muted-foreground"
+      >
+        Belum punya akun?{" "}
+        <Link to="/register" className="font-bold text-primary hover:underline">
+          Daftar
+        </Link>
+      </motion.p>
     </>
   );
 }
