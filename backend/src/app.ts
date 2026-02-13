@@ -1,3 +1,4 @@
+/// <reference path="./types/express.d.ts" />
 import express from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
@@ -9,8 +10,6 @@ import routes from './routes';
 import { errorHandler } from './middlewares/error';
 
 dotenv.config();
-
-connectDB();
 
 const app = express();
 
@@ -25,8 +24,10 @@ app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, () => {
-  console.log(`Server running in ${process.env.NODE_ENV} mode on port ${PORT}`);
+connectDB().then(() => {
+  app.listen(PORT, () => {
+    console.log(`Server running in ${process.env.NODE_ENV} mode on port ${PORT}`);
+  });
 });
 
 export default app;

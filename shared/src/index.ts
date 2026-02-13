@@ -1,4 +1,8 @@
 import { z } from "zod";
+import DOMPurify from 'isomorphic-dompurify';
+
+export const sanitizeHtml = (html: string) => DOMPurify.sanitize(html);
+
 
 export const loginSchema = z.object({
   email: z.string().email("Email tidak valid"),
