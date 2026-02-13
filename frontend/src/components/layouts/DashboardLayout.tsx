@@ -44,9 +44,9 @@ export default function DashboardLayout() {
               <TooltipTrigger asChild>
                 <Link
                   to={link.to}
-                  className={`flex h-10 w-10 items-center justify-center rounded-xl transition-colors ${
+                  className={`flex h-10 w-10 items-center justify-center rounded-xl transition-all ${
                     isActive(link.to, link.exact)
-                      ? "bg-primary text-primary-foreground"
+                      ? "bg-primary text-primary-foreground shadow-[0_4px_0_0_color-mix(in_srgb,var(--color-primary),black_20%)]"
                       : "text-muted-foreground hover:bg-secondary hover:text-foreground"
                   }`}
                 >
@@ -104,9 +104,9 @@ export default function DashboardLayout() {
               <Link
                 key={link.to}
                 to={link.to}
-                className={`flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-colors ${
+                className={`flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-bold transition-all ${
                   active
-                    ? "bg-primary/10 text-primary"
+                    ? "bg-primary text-primary-foreground shadow-[0_3px_0_0_color-mix(in_srgb,var(--color-primary),black_20%)] -translate-y-0.5"
                     : "text-muted-foreground hover:bg-secondary"
                 }`}
               >

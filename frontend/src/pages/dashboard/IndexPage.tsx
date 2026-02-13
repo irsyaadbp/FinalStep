@@ -75,7 +75,7 @@ export default function IndexPage() {
             {students.slice(0, 5).map((s) => (
               <div
                 key={s.id}
-                className="flex items-center justify-between rounded-lg bg-secondary p-3"
+                className="flex items-center justify-between rounded-xl bg-secondary border border-border/50 shadow-[0_4px_0_0_color-mix(in_srgb,var(--color-secondary),black_10%),0_4px_12px_0_rgba(0,0,0,0.05)] p-3"
               >
                 <div>
                   <p className="text-sm font-medium">{s.name}</p>

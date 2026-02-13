@@ -76,7 +76,6 @@ export const router = createBrowserRouter([
         children: [
           { index: true, element: <DashboardIndexPage /> },
           { path: "subjects", element: <DashboardSubjectsPage /> },
-          // subjects -> [slug]/materials -> [slug]/quizzes
           {
             path: "subjects/:slug/materials",
             element: <DashboardMaterialsPage />,

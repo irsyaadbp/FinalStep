@@ -51,9 +51,9 @@ export default function AppLayout() {
               <TooltipTrigger asChild>
                 <Link
                   to={link.to}
-                  className={`flex h-10 w-10 items-center justify-center rounded-xl transition-colors ${
+                  className={`flex h-10 w-10 items-center justify-center rounded-xl transition-all ${
                     isActive(link.to)
-                      ? "bg-primary text-primary-foreground"
+                      ? "bg-primary text-primary-foreground shadow-[0_4px_0_0_color-mix(in_srgb,var(--color-primary),black_20%)]"
                       : "text-muted-foreground hover:bg-secondary hover:text-foreground"
                   }`}
                 >
@@ -101,9 +101,9 @@ export default function AppLayout() {
                 className="flex flex-col items-center gap-0.5 py-1 min-w-[56px]"
               >
                 <div
-                  className={`flex h-8 w-8 items-center justify-center rounded-2xl transition-all ${
+                  className={`flex h-8 w-8 items-center justify-center rounded-xl transition-all ${
                     active
-                      ? "bg-primary text-primary-foreground"
+                      ? "bg-primary text-primary-foreground shadow-[0_3px_0_0_color-mix(in_srgb,var(--color-primary),black_20%)] -translate-y-0.5"
                       : "text-muted-foreground"
                   }`}
                 >

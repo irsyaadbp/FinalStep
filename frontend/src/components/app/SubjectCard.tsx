@@ -9,6 +9,7 @@ export interface Subject {
   title: string;
   progress: number;
   icon: string;
+  color?: string;
   totalChapters?: number;
   completedChapters?: number;
 }
