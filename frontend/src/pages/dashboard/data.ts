@@ -70,3 +70,7 @@ export const students = [
     streak: 3,
   },
 ];
+export const settings = {
+  examDate: "2026-05-15",
+  targetThreshold: 80,
+};

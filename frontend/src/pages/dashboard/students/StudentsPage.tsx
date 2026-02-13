@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { students } from "../data";
-import { Card, CardContent } from "../../../components/ui/Card";
+import { Card, CardContent } from "@/components/ui/Card";
 import {
   Table,
   TableBody,
@@ -8,10 +8,10 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "../../../components/ui/Table";
-import { Badge } from "../../../components/ui/Badge";
-import { Avatar, AvatarFallback } from "../../../components/ui/Avatar";
-import { Button } from "../../../components/ui/Button";
+} from "@/components/ui/Table";
+import { Badge } from "@/components/ui/Badge";
+import { Avatar, AvatarFallback } from "@/components/ui/Avatar";
+import { Button } from "@/components/ui/Button";
 import { Flame, Star, GraduationCap, ChevronLeft, ChevronRight } from "lucide-react";
 
 const ITEMS_PER_PAGE = 5;
@@ -135,7 +135,7 @@ export default function StudentsPage() {
                     <Badge variant="secondary">{s.targetUniversity}</Badge>
                   </TableCell>
                   <TableCell>
-                    <div className="flex items-center gap-2 min-w-[120px]">
+                    <div className="flex items-center gap-2 min-w-30">
                       <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-secondary">
                         <div
                           className="h-full rounded-full bg-primary shadow-[inset_0_1px_0_0_rgba(255,255,255,0.4),inset_0_-1px_2px_0_rgba(0,0,0,0.1)] transition-all"
@@ -185,7 +185,7 @@ export default function StudentsPage() {
             <ChevronLeft className="h-4 w-4 mr-1" />
             Sebelumnya
           </Button>
-          <div className="flex items-center justify-center min-w-[32px] h-8 text-sm font-medium">
+          <div className="flex items-center justify-center min-w-8 h-8 text-sm font-medium">
             {currentPage} / {totalPages}
           </div>
           <Button
