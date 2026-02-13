@@ -9,20 +9,11 @@ import { useToast } from "../../../hooks/useToast";
 import { subjects as initialSubjects, allChapters as chapters, quizzes } from "../../app/subjects/data";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
+import { subjectSchema, type SubjectInput as SubjectFormValues } from "@finalstep/shared";
 import { FormGenerator, type FormField } from "../../../components/common/FormGenerator";
 
 const COLORS = ['bg-blue-500', 'bg-amber-500', 'bg-emerald-500', 'bg-pink-500', 'bg-cyan-500', 'bg-red-500', 'bg-purple-500', 'bg-orange-500'];
 const ICONS = ['📐', '⚡', '🧪', '🧬', '📝', '📖', '🎨', '🌍', '💻', '🎵'];
-
-
-const subjectSchema = z.object({
-  title: z.string().min(1, "Nama pelajaran harus diisi"),
-  icon: z.string().min(1),
-  color: z.string().min(1),
-});
-
-type SubjectFormValues = z.infer<typeof subjectSchema>;
 
 export default function SubjectsPage() {
   const [subjects, setSubjects] = useState<Subject[]>(

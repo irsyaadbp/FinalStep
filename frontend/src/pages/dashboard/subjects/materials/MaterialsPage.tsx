@@ -10,6 +10,17 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { Badge } from '../../../../components/ui/Badge';
 import { useToast } from '../../../../hooks/useToast';
 import { subjects as initialSubjects, allChapters as initialChapters, quizzes as initialQuizzes, finalExams as initialFinalExams } from '../../../app/subjects/data';
+import { cn } from '../../../../lib/utils';
+import { z } from 'zod';
+import { useForm, useFieldArray } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { 
+  chapterSchema, 
+  finalExamSchema, 
+  type ChapterInput as ChapterFormValues, 
+  type FinalExamInput as FinalExamFormValues 
+} from "@finalstep/shared";
+import { FormGenerator, type FormField } from '../../../../components/common/FormGenerator';
 
 export interface QuizQuestion {
   id: string;
@@ -53,13 +64,131 @@ export default function MaterialsPage() {
 
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editing, setEditing] = useState<Chapter | null>(null);
-  const [form, setForm] = useState({ title: '', content: '' });
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
+
+  // Chapter react-hook-form
+  const {
+    register: registerChapter,
+    handleSubmit: handleSubmitChapter,
+    formState: { errors: errorsChapter },
+    reset: resetChapter,
+  } = useForm<ChapterFormValues>({
+    resolver: zodResolver(chapterSchema),
+    defaultValues: { title: '', content: '' },
+  });
+
+  const chapterFields: FormField<ChapterFormValues>[] = [
+    {
+      id: 'title',
+      label: 'Judul Materi',
+      placeholder: 'Limit Fungsi',
+      required: true,
+    },
+    {
+      id: 'content',
+      label: 'Konten (HTML)',
+      placeholder: '<h2>Judul</h2><p>Konten materi...</p>',
+      render: ({ field, register, errors }) => (
+        <Textarea
+          id={field.id}
+          {...register(field.id)}
+          placeholder={field.placeholder}
+          className={cn(
+            "min-h-[200px] rounded-xl border-2 bg-background shadow-[inset_0_2px_4px_0_rgba(0,0,0,0.04)] focus:shadow-[inset_0_2px_4px_0_rgba(0,0,0,0.04),0_0_0_3px_hsl(var(--primary)/0.12)] transition-shadow text-sm",
+            errors[field.id] && "border-destructive"
+          )}
+          rows={8}
+        />
+      ),
+    },
+  ];
+
+  // Final exam react-hook-form
+  const {
+    register: registerExam,
+    handleSubmit: handleSubmitExam,
+    formState: { errors: errorsExam },
+    reset: resetExam,
+    control: controlExam,
+  } = useForm<FinalExamFormValues>({
+    resolver: zodResolver(finalExamSchema),
+    defaultValues: { title: '', questions: [] },
+  });
+
+  const { fields: questionFields, append: appendQuestion, remove: removeQuestion } = useFieldArray({
+    control: controlExam,
+    name: 'questions',
+  });
+
+  const examFields: FormField<FinalExamFormValues>[] = [
+    {
+      id: 'title',
+      label: 'Judul Ujian',
+      placeholder: 'Ujian Akhir Matematika',
+      required: true,
+    },
+    {
+      id: 'questions',
+      label: 'Soal-soal',
+      render: () => (
+        <div className="space-y-4">
+          <Label>Soal-soal</Label>
+          {questionFields.map((q, qi) => (
+            <Card key={q.id} className="p-4 space-y-3">
+              <div className="flex items-start justify-between gap-2">
+                <span className="text-sm font-medium text-muted-foreground shrink-0 mt-2">#{qi + 1}</span>
+                <div className="flex-1 space-y-1">
+                  <Input
+                    className={cn(
+                        "h-11 rounded-xl border-2 bg-background shadow-[inset_0_2px_4px_0_rgba(0,0,0,0.04)] focus:shadow-[inset_0_2px_4px_0_rgba(0,0,0,0.04),0_0_0_3px_hsl(var(--primary)/0.12)] transition-shadow text-sm",
+                        errorsExam.questions?.[qi]?.question && "border-destructive"
+                    )}
+                    {...registerExam(`questions.${qi}.question`)}
+                    placeholder="Tulis pertanyaan..."
+                  />
+                  {errorsExam.questions?.[qi]?.question && (
+                    <p className="text-xs text-destructive font-medium">{errorsExam.questions[qi]?.question?.message}</p>
+                  )}
+                </div>
+                <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0 text-destructive" onClick={() => removeQuestion(qi)} disabled={questionFields.length <= 1}>
+                  <X className="h-3.5 w-3.5" />
+                </Button>
+              </div>
+              <div className="grid grid-cols-2 gap-2 pl-8">
+                {[0, 1, 2, 3].map((oi) => (
+                  <div key={oi} className="space-y-1">
+                    <div className="flex items-center gap-2">
+                        <input
+                            type="radio"
+                            value={oi}
+                            {...registerExam(`questions.${qi}.correctAnswer`, { valueAsNumber: true })}
+                            className="accent-primary"
+                        />
+                        <Input
+                            {...registerExam(`questions.${qi}.options.${oi}`)}
+                            placeholder={`Opsi ${String.fromCharCode(65 + oi)}`}
+                            className={cn(
+                                "text-sm h-9 rounded-lg border-2 bg-background",
+                                errorsExam.questions?.[qi]?.options?.[oi] && "border-destructive"
+                            )}
+                        />
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <p className="text-xs text-muted-foreground pl-8">Pilih radio button untuk menandai jawaban benar</p>
+            </Card>
+          ))}
+          <Button variant="outline" type="button" size="sm" onClick={() => appendQuestion({ id: `fq-${Math.random().toString(36).substring(2, 9)}`, question: '', options: ['', '', '', ''], correctAnswer: 0 })} className="w-full">
+            <Plus className="mr-1 h-3.5 w-3.5" /> Tambah Soal
+          </Button>
+        </div>
+      )
+    }
+  ];
 
   // Final exam state
   const [examDialogOpen, setExamDialogOpen] = useState(false);
-  const [examTitle, setExamTitle] = useState('');
-  const [examQuestions, setExamQuestions] = useState<QuizQuestion[]>([]);
   const [deleteExamConfirm, setDeleteExamConfirm] = useState(false);
 
   if (!subject) {
@@ -126,28 +255,27 @@ export default function MaterialsPage() {
 
   const openCreate = () => {
     setEditing(null);
-    setForm({ title: '', content: '' });
+    resetChapter({ title: '', content: '' });
     setDialogOpen(true);
   };
 
   const openEdit = (ch: Chapter) => {
     setEditing(ch);
-    setForm({ title: ch.title, content: ch.content });
+    resetChapter({ title: ch.title, content: ch.content });
     setDialogOpen(true);
   };
 
-  const handleSave = () => {
-    if (!form.title.trim()) return;
+  const handleSaveChapter = (data: ChapterFormValues) => {
     if (editing) {
-      updateChapter(editing.id, { title: form.title, content: form.content });
+      updateChapter(editing.id, { title: data.title, content: data.content });
       toast({ title: 'Materi diperbarui' });
     } else {
-      const id = `${subjectId}-${Math.random().toString(36).substring(2, 9)}`;
+      const id = `${subjectId}-${Date.now().toString(36)}`;
       addChapter({
         id,
         subjectId: subjectId!,
-        title: form.title,
-        content: form.content || `<h2>${form.title}</h2><p>Konten materi akan ditambahkan di sini.</p>`,
+        title: data.title,
+        content: data.content || `<h2>${data.title}</h2><p>Konten materi akan ditambahkan di sini.</p>`,
         completed: false,
         order: subjectChapters.length + 1,
       });
@@ -165,49 +293,22 @@ export default function MaterialsPage() {
   // Final exam handlers
   const openExamDialog = () => {
     if (finalExam) {
-      setExamTitle(finalExam.title);
-      setExamQuestions([...finalExam.questions]);
+      resetExam({ title: finalExam.title, questions: finalExam.questions });
     } else {
-      setExamTitle(`Ujian Akhir ${subject.title}`);
-      setExamQuestions([{ id: `fq-${Math.random().toString(36).substring(2, 9)}`, question: '', options: ['', '', '', ''], correctAnswer: 0 }]);
+      resetExam({
+        title: `Ujian Akhir ${subject.title}`,
+        questions: [{ id: `fq-${Math.random().toString(36).substring(2, 9)}`, question: '', options: ['', '', '', ''], correctAnswer: 0 }]
+      });
     }
     setExamDialogOpen(true);
   };
 
-  const addQuestion = () => {
-    setExamQuestions([...examQuestions, { id: `fq-${Math.random().toString(36).substring(2, 9)}`, question: '', options: ['', '', '', ''], correctAnswer: 0 }]);
-  };
-
-  const updateQuestion = (index: number, field: string, value: string | number) => {
-    const updated = [...examQuestions];
-    if (field === 'question') updated[index] = { ...updated[index], question: value as string };
-    else if (field === 'correctAnswer') updated[index] = { ...updated[index], correctAnswer: value as number };
-    setExamQuestions(updated);
-  };
-
-  const updateOption = (qIndex: number, oIndex: number, value: string) => {
-    const updated = [...examQuestions];
-    const newOptions = [...updated[qIndex].options];
-    newOptions[oIndex] = value;
-    updated[qIndex] = { ...updated[qIndex], options: newOptions };
-    setExamQuestions(updated);
-  };
-
-  const removeQuestion = (index: number) => {
-    if (examQuestions.length <= 1) return;
-    setExamQuestions(examQuestions.filter((_, i) => i !== index));
-  };
-
-  const handleSaveExam = () => {
-    if (!examTitle.trim() || examQuestions.some((q) => !q.question.trim() || q.options.some((o) => !o.trim()))) {
-        toast({ title: 'Lengkapi semua soal dan opsi' });
-      return;
-    }
+  const handleSaveExam = (data: FinalExamFormValues) => {
     if (finalExam) {
-      updateFinalExam(subjectId!, { title: examTitle, questions: examQuestions });
+      updateFinalExam(subjectId!, { title: data.title, questions: data.questions });
       toast({ title: 'Ujian Akhir diperbarui' });
     } else {
-      addFinalExam({ id: `final-${subjectId}`, subjectId: subjectId!, title: examTitle, questions: examQuestions, passed: false });
+      addFinalExam({ id: `final-${subjectId}`, subjectId: subjectId!, title: data.title, questions: data.questions, passed: false });
       toast({ title: 'Ujian Akhir ditambahkan' });
     }
     setExamDialogOpen(false);
@@ -313,19 +414,14 @@ export default function MaterialsPage() {
           <DialogHeader>
             <DialogTitle>{editing ? 'Edit Materi' : 'Tambah Materi'}</DialogTitle>
           </DialogHeader>
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <Label>Judul Materi</Label>
-              <Input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} placeholder="Limit Fungsi" />
-            </div>
-            <div className="space-y-2">
-              <Label>Konten (HTML)</Label>
-              <Textarea value={form.content} onChange={(e) => setForm({ ...form, content: e.target.value })} placeholder="<h2>Judul</h2><p>Konten materi...</p>" rows={8} />
-            </div>
-          </div>
+          <FormGenerator
+            fields={chapterFields}
+            register={registerChapter}
+            errors={errorsChapter}
+          />
           <DialogFooter>
             <Button variant="outline" onClick={() => setDialogOpen(false)}>Batal</Button>
-            <Button onClick={handleSave}>{editing ? 'Simpan' : 'Tambah'}</Button>
+            <Button onClick={handleSubmitChapter(handleSaveChapter)}>{editing ? 'Simpan' : 'Tambah'}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -348,57 +444,14 @@ export default function MaterialsPage() {
           <DialogHeader>
             <DialogTitle>{finalExam ? 'Edit Ujian Akhir' : 'Tambah Ujian Akhir'}</DialogTitle>
           </DialogHeader>
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <Label>Judul Ujian</Label>
-              <Input value={examTitle} onChange={(e) => setExamTitle(e.target.value)} placeholder="Ujian Akhir Matematika" />
-            </div>
-            <div className="space-y-4">
-              <Label>Soal-soal</Label>
-              {examQuestions.map((q, qi) => (
-                <Card key={q.id} className="p-4 space-y-3">
-                  <div className="flex items-start justify-between gap-2">
-                    <span className="text-sm font-medium text-muted-foreground shrink-0 mt-2">#{qi + 1}</span>
-                    <Input
-                      className="flex-1"
-                      value={q.question}
-                      onChange={(e) => updateQuestion(qi, 'question', e.target.value)}
-                      placeholder="Tulis pertanyaan..."
-                    />
-                    <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0 text-destructive" onClick={() => removeQuestion(qi)} disabled={examQuestions.length <= 1}>
-                      <X className="h-3.5 w-3.5" />
-                    </Button>
-                  </div>
-                  <div className="grid grid-cols-2 gap-2 pl-8">
-                    {q.options.map((opt, oi) => (
-                      <div key={oi} className="flex items-center gap-2">
-                        <input
-                          type="radio"
-                          name={`correct-${qi}`}
-                          checked={q.correctAnswer === oi}
-                          onChange={() => updateQuestion(qi, 'correctAnswer', oi)}
-                          className="accent-primary"
-                        />
-                        <Input
-                          value={opt}
-                          onChange={(e) => updateOption(qi, oi, e.target.value)}
-                          placeholder={`Opsi ${String.fromCharCode(65 + oi)}`}
-                          className="text-sm"
-                        />
-                      </div>
-                    ))}
-                  </div>
-                  <p className="text-xs text-muted-foreground pl-8">Pilih radio button untuk menandai jawaban benar</p>
-                </Card>
-              ))}
-              <Button variant="outline" size="sm" onClick={addQuestion} className="w-full">
-                <Plus className="mr-1 h-3.5 w-3.5" /> Tambah Soal
-              </Button>
-            </div>
-          </div>
+          <FormGenerator
+            fields={examFields}
+            register={registerExam}
+            errors={errorsExam}
+          />
           <DialogFooter>
             <Button variant="outline" onClick={() => setExamDialogOpen(false)}>Batal</Button>
-            <Button onClick={handleSaveExam}>{finalExam ? 'Simpan' : 'Tambah'}</Button>
+            <Button onClick={handleSubmitExam(handleSaveExam)}>{finalExam ? 'Simpan' : 'Tambah'}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
