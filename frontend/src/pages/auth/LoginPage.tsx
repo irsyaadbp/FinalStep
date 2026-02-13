@@ -69,8 +69,8 @@ export default function LoginPage() {
             delay: 0.1,
           }}
         >
-          <div className="mx-auto mb-5 flex h-20 w-20 items-center justify-center rounded-3xl bg-primary shadow-[inset_0_2px_0_0_rgba(255,255,255,0.3),0_8px_24px_0_hsl(252 60% 50%/0.35)]">
-            <GraduationCap className="h-10 w-10 text-primary-foreground" />
+          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-3xl bg-primary shadow-[inset_0_1px_0_0_rgba(255,255,255,0.2),0_6px_0_0_color-mix(in_srgb,var(--color-primary),black_20%),0_6px_15px_0_color-mix(in_srgb,var(--color-primary)_30%,transparent)]">
+            <GraduationCap className="h-8 w-8 text-primary-foreground" />
           </div>
         </motion.div>
         <motion.div
