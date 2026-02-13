@@ -35,6 +35,18 @@ export const chapterSchema = z.object({
 export type ChapterInput = z.infer<typeof chapterSchema>;
 
 // Final Exams / Quizzes
+export const quizSchema = z.object({
+  title: z.string().min(1, 'Judul quiz harus diisi'),
+  questions: z.array(z.object({
+    id: z.string(),
+    question: z.string().min(1, 'Pertanyaan harus diisi'),
+    options: z.array(z.string().min(1, 'Opsi harus diisi')).length(4),
+    correctAnswer: z.number().min(0).max(3),
+  })).min(1, 'Minimal 1 pertanyaan'),
+});
+
+export type QuizInput = z.infer<typeof quizSchema>;
+
 export const finalExamSchema = z.object({
   title: z.string().min(1, 'Judul ujian harus diisi'),
   questions: z.array(z.object({
