@@ -2,19 +2,7 @@ import { Router, Request, Response } from 'express';
 
 const router = Router();
 
-import mongoose from 'mongoose';
 
-router.get('/', (req: Request, res: Response) => {
-  const mongoStatus = mongoose.connection.readyState === 1 ? 'connected' : 'disconnected';
-  res.status(200).json({
-    project: 'FinalStep API',
-    status: 'UP',
-    version: '1.0.0',
-    uptime: process.uptime(),
-    mongodb: mongoStatus,
-    timestamp: new Date()
-  });
-});
 
 import authRoutes from './auth.routes';
 import subjectRoutes from './subject.routes';

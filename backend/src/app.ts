@@ -17,6 +17,15 @@ app.use(helmet());
 app.use(cors(corsOptions));
 app.use(express.json());
 app.use(morgan(process.env.NODE_ENV === 'development' ? 'dev' : 'combined'));
+app.get('/', (_req, res) => {
+  res.status(200).json({
+    project: 'FinalStep API',
+    status: 'UP',
+    version: '1.0.0',
+    uptime: process.uptime(),
+    timestamp: new Date()
+  });
+});
 
 app.use('/api', routes);
 
