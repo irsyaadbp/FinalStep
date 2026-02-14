@@ -18,7 +18,12 @@ import { quizService } from "@/service/quiz";
 import { finalExamService } from "@/service/finalExam";
 import { progressService } from "@/service/progress";
 import { useAsyncFetch } from "@/hooks/useAsyncFetch";
-import { type Subject, type Chapter, type Quiz, type FinalExam } from "@/types/shared";
+import {
+  type Subject,
+  type Chapter,
+  type Quiz,
+  type FinalExam,
+} from "@/types/shared";
 import { toast } from "sonner";
 
 type ViewMode = "reading" | "quiz" | "finalExam" | "completed";
@@ -48,11 +53,11 @@ export default function SubjectMaterialPage() {
     {
       onSuccess: (res) => {
         if (res?.data) {
-          const found = res.data.find(s => s.slug === slug);
+          const found = res.data.find((s) => s.slug === slug);
           setSubject(found || null);
         }
       },
-    }
+    },
   );
 
   useAsyncFetch(
@@ -62,11 +67,11 @@ export default function SubjectMaterialPage() {
     },
     {
       onSuccess: (res) => {
-        if (res && 'data' in res && res.data) {
+        if (res && "data" in res && res.data) {
           setChapters(res.data);
         }
       },
-    }
+    },
   );
 
   // Fetch Final Exam
@@ -124,7 +129,9 @@ export default function SubjectMaterialPage() {
     fetchMaterial();
   }, [slug, materialId, chapters, finalExam]);
 
-  const activeChapterIndex = chapters.findIndex((c) => c.slug === materialId || c._id === materialId);
+  const activeChapterIndex = chapters.findIndex(
+    (c) => c.slug === materialId || c._id === materialId,
+  );
   const nextChapter = chapters[activeChapterIndex + 1];
   const prevChapter = chapters[activeChapterIndex - 1];
 
@@ -149,8 +156,9 @@ export default function SubjectMaterialPage() {
       if (viewMode === "reading" || viewMode === "quiz") {
         if (activeChapter) {
           await progressService.completeChapter(slug, activeChapter.slug);
-          if (activeQuiz && !finalExam) { // It was a chapter quiz
-             await progressService.completeQuiz(slug, activeQuiz._id);
+          if (activeQuiz && !finalExam) {
+            // It was a chapter quiz
+            await progressService.completeQuiz(slug, activeQuiz._id);
           }
         }
       } else if (viewMode === "finalExam") {
@@ -158,9 +166,12 @@ export default function SubjectMaterialPage() {
       }
 
       await refreshUser();
-      
+
       toast.success("Materi selesai! 🎉", {
-        description: viewMode === "finalExam" ? "Selamat! Kamu telah menyelesaikan mata pelajaran ini." : "+25 XP diperoleh",
+        description:
+          viewMode === "finalExam"
+            ? "Selamat! Kamu telah menyelesaikan mata pelajaran ini."
+            : "+25 XP diperoleh",
       });
 
       if (nextChapter) {
@@ -402,7 +413,8 @@ export default function SubjectMaterialPage() {
                             const isCorrect = oi === q.correctAnswer;
                             let cls = "border-border hover:bg-secondary";
                             if (quizSubmitted) {
-                              if (isCorrect) cls = "border-success bg-success/10";
+                              if (isCorrect)
+                                cls = "border-success bg-success/10";
                               else if (selected && !isCorrect)
                                 cls = "border-destructive bg-destructive/10";
                             } else if (selected) {
@@ -471,8 +483,8 @@ export default function SubjectMaterialPage() {
                   <div>
                     <h3 className="font-bold">{finalExam?.title}</h3>
                     <p className="text-xs text-muted-foreground">
-                      {finalExam?.questions.length} soal • Ambil ujian
-                      ini untuk mendapatkan sertifikat dan XP tambahan!
+                      {finalExam?.questions.length} soal • Ambil ujian ini untuk
+                      mendapatkan sertifikat dan XP tambahan!
                     </p>
                   </div>
                 </div>
@@ -533,7 +545,9 @@ export default function SubjectMaterialPage() {
                 // Final Exam Back Button
                 <div className="shrink-0 flex items-center gap-1.5 px-3 py-1.5 bg-xp/10 rounded-xl text-xp font-black tabular-nums text-xs border border-xp/20">
                   <Clock className="h-3.5 w-3.5" />
-                  <span>{timeLeft !== null ? formatTime(timeLeft) : "--:--"}</span>
+                  <span>
+                    {timeLeft !== null ? formatTime(timeLeft) : "--:--"}
+                  </span>
                 </div>
               )}
 

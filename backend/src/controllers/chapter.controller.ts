@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { Chapter } from '../models';
+import { Chapter, Quiz } from '../models';
 import { success, error } from '../utils/response';
 import { ChapterInput, sanitizeHtml } from '../types/shared';
 
@@ -56,13 +56,15 @@ export const getChapters = async (req: Request, res: Response, next: NextFunctio
 export const getChapter = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { subjectSlug, slug } = req.params as { subjectSlug: string; slug: string };
-    const chapter = await Chapter.findOne({ subjectSlug, slug, isActive: true });
+    const chapter = await Chapter.findOne({ subjectSlug, slug, isActive: true }).lean();
     
     if (!chapter) {
       return res.status(404).json(error('Chapter not found'));
     }
 
-    res.json(success('Chapter retrieved', chapter));
+    const quiz = await Quiz.exists({ subjectSlug, chapterSlug: slug, isActive: true });
+
+    res.json(success('Chapter retrieved', { ...chapter, hasQuiz: !!quiz }));
   } catch (err) {
     next(err);
   }

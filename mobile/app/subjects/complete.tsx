@@ -48,9 +48,9 @@ export default function CompletionScreen() {
             variant="default" 
             size="lg" 
             className="h-16 rounded-2xl"
-            onPress={() => router.push(`/exams/${subjectName.toLowerCase()}`)}
+            onPress={() => router.push('/(tabs)/subjects')}
           >
-            <Text className="text-lg font-bold text-white">Mulai Ujian Akhir</Text>
+            <Text className="text-lg font-bold text-white">Kembali ke Pelajaran</Text>
           </Button>
           
           <Button 

@@ -6,74 +6,150 @@ import { useRouter } from 'expo-router';
 import { Flame, Zap, AlertTriangle, ChevronRight } from 'lucide-react-native';
 import { useColorScheme } from 'nativewind';
 import * as React from 'react';
-import { ScrollView, View, TouchableOpacity, Dimensions } from 'react-native';
+import { ScrollView, View, TouchableOpacity, Dimensions, RefreshControl } from 'react-native';
+
+import { useAuth } from '@/context/AuthContext';
+import { useAsyncFetch } from '@/hooks/useAsyncFetch';
+import { subjectService } from '@/services/subject';
+import { Subject } from '@/lib/types';
+import { SubjectCard } from '@/components/ui/subject-card';
 
 const { width } = Dimensions.get('window');
 const CARD_WIDTH = (width - 48 - 16) / 2;
 
 export default function HomeScreen() {
-  const { colorScheme } = useColorScheme();
+  const { user, refreshUser } = useAuth();
   const router = useRouter();
+  const [refreshing, setRefreshing] = React.useState(false);
+
+  const { data: subjectsData, execute: refreshSubjects } = useAsyncFetch(
+    async () => {
+      return await subjectService.getSubjects();
+    }
+  );
+
+  const onRefresh = React.useCallback(async () => {
+    setRefreshing(true);
+    await Promise.all([refreshUser(), refreshSubjects()]);
+    setRefreshing(false);
+  }, [refreshUser, refreshSubjects]);
+
+  const subjects = React.useMemo(() => {
+    if (!subjectsData?.data || !user) return [];
+    return subjectsData.data.map((s) => {
+      const userProgress = user.progress?.find((p) => p.subjectSlug === s.slug);
+      return {
+        ...s,
+        progress: userProgress?.progressPercent || 0,
+      };
+    });
+  }, [subjectsData, user]);
+
+  const name = user?.name.split(' ')[0] || 'Siswa';
+  const streak = user?.streak || 0;
+  const dailyXP = user?.dailyXP || 0;
+  const dailyGoal = user?.dailyGoal || 100;
+  
+  const totalChapters = subjects.reduce((acc, s) => acc + (s.totalChapters || 0), 0);
+  const completedChapters = user?.progress?.reduce((acc, p) => acc + (p.completedChapters?.length || 0), 0) || 0;
+  const overallProgress = totalChapters > 0 ? Math.round((completedChapters / totalChapters) * 100) : 0;
+  const lastStudy = user?.lastStudy;
+
+  const daysLeft = 12; // Static for now matching frontend
+  const timeProgress = 30; // Static for now matching frontend
+
+  const handleStartLearning = () => {
+    if (!lastStudy) {
+      router.push('/(tabs)/subjects');
+    } else {
+      const subjectProgress = user?.progress?.find(p => p.subjectSlug === lastStudy.subjectSlug);
+      const isExamDone = lastStudy.type === 'final_exam' && subjectProgress?.finalExamDone;
+
+      if (isExamDone) {
+        router.push('/(tabs)/subjects');
+      } else {
+        // If last study was a quiz, go to the chapter reading instead
+        const targetSlug = lastStudy.type === 'quiz' ? lastStudy.chapterSlug : (lastStudy.materialId || lastStudy.chapterSlug);
+        
+        if (targetSlug) {
+          router.push(`/subjects/${lastStudy.subjectSlug}/material/${targetSlug}`);
+        } else {
+          router.push(`/subjects/${lastStudy.subjectSlug}`);
+        }
+      }
+    }
+  };
 
   return (
     <View className="flex-1 bg-background">
-      <ScrollView className="flex-1" contentContainerStyle={{ paddingBottom: 120 }}>
+      <ScrollView 
+        className="flex-1" 
+        contentContainerStyle={{ paddingBottom: 120 }}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+      >
         {/* Header */}
-        <View className="flex-row items-center justify-between px-6 pt-12 pb-6">
+        <View className="flex-row items-center justify-between px-6 pb-6 pt-12">
           <View>
-            <Text className="text-2xl font-extrabold">Halo, Andi 👋</Text>
-            <Text className="text-muted-foreground text-sm">Yuk lanjutkan belajarmu!</Text>
+            <Text className="text-2xl font-extrabold">Halo, {name} 👋</Text>
+            <Text className="text-sm text-muted-foreground">Yuk lanjutkan belajarmu!</Text>
           </View>
-          <TouchableOpacity className="flex-row items-center bg-orange-100 dark:bg-orange-950/30 px-3 py-1.5 rounded-full border border-orange-200 dark:border-orange-900/50">
-            <Icon as={Flame} size={18} className="text-orange-500 mr-1.5" />
-            <Text className="text-orange-600 font-bold">0</Text>
+          <TouchableOpacity className="flex-row items-center rounded-full border border-orange-200 bg-orange-100 px-3 py-1.5 dark:border-orange-900/50 dark:bg-orange-950/30">
+            <Icon as={Flame} size={18} className="mr-1.5 text-orange-500" />
+            <Text className="font-bold text-orange-600">{streak}</Text>
           </TouchableOpacity>
         </View>
 
         {/* Main Stats Card */}
-        <View className="px-6 mb-8 mt-2">
+        <View className="mb-8 mt-2 px-6">
           <Card contentClassName="p-6">
-            <View className="flex-row items-center justify-between mb-4">
+            <View className="mb-4 flex-row items-center justify-between">
               <View className="flex-row items-center gap-3">
-                <View className="p-2 bg-orange-100 dark:bg-orange-950/30 rounded-xl">
+                <View className="rounded-xl bg-orange-100 p-2 dark:bg-orange-950/30">
                   <Icon as={Zap} size={20} className="text-orange-500" />
                 </View>
-                <Text className="font-bold text-lg">Target Harian</Text>
+                <Text className="text-lg font-bold">Target Harian</Text>
               </View>
-              <Text className="text-orange-500 font-bold">0/100 XP</Text>
+              <Text className="font-bold text-orange-500">{dailyXP}/{dailyGoal} XP</Text>
             </View>
-            <View className="h-2.5 bg-secondary rounded-full overflow-hidden">
-              <View className="h-full bg-slate-200 w-[5%]" />
+            <View className="h-2.5 overflow-hidden rounded-full bg-secondary">
+              <View 
+                className="h-full bg-orange-500" 
+                style={{ width: `${Math.min(100, (dailyXP / dailyGoal) * 100)}%` }}
+              />
             </View>
 
             {/* Alert Card Inside (Flat Style) */}
-            <View className="mt-6 bg-slate-50 dark:bg-slate-800/50 p-5 rounded-[24px] border border-slate-100 dark:border-slate-800">
-              <View className="flex-row items-center gap-3 mb-3">
-                <View className="p-1.5 bg-orange-100 rounded-lg">
+            <View className="mt-6 rounded-[24px] border border-slate-100 bg-slate-50 p-5 dark:border-slate-800 dark:bg-slate-800/50">
+              <View className="mb-3 flex-row items-center gap-3">
+                <View className="rounded-lg bg-orange-100 p-1.5">
                   <Icon as={AlertTriangle} size={16} className="text-orange-500" />
                 </View>
-                <Text className="font-bold text-sm">Perlu Kejar! ⚠️</Text>
+                <Text className="text-sm font-bold">
+                  {dailyXP >= dailyGoal ? "Target Tercapai! 🎉" : "Perlu Kejar! ⚠️"}
+                </Text>
                 <View className="flex-1" />
               </View>
-              <View className="flex-row justify-between mb-4">
-                 <Text className="text-xs text-muted-foreground">0/18 bab</Text>
-                 <Text className="text-xs text-muted-foreground">0% selesai</Text>
-                 <Text className="text-xs text-muted-foreground">📅 12 hari lagi</Text>
+              <View className="mb-4 flex-row justify-between">
+                <Text className="text-xs text-muted-foreground">{completedChapters}/{totalChapters} bab</Text>
+                <Text className="text-xs text-muted-foreground">{overallProgress}% selesai</Text>
+                <Text className="text-xs text-muted-foreground">📅 {daysLeft} hari lagi</Text>
               </View>
               <View className="gap-2">
                 <View className="flex-row justify-between">
                   <Text className="text-[10px] text-muted-foreground">Progres Kamu</Text>
-                  <Text className="text-[10px] font-bold text-primary">0%</Text>
+                  <Text className="text-[10px] font-bold text-primary">{overallProgress}%</Text>
                 </View>
-                <View className="h-1.5 bg-slate-200 rounded-full">
-                  <View className="h-full bg-primary w-[2%]" />
+                <View className="h-1.5 rounded-full bg-slate-200">
+                  <View className="h-full bg-primary" style={{ width: `${overallProgress}%` }} />
                 </View>
                 <View className="flex-row justify-between">
                   <Text className="text-[10px] text-muted-foreground">Target Ideal</Text>
-                  <Text className="text-[10px] font-bold text-slate-400">30%</Text>
+                  <Text className="text-[10px] font-bold text-slate-400">{timeProgress}%</Text>
                 </View>
-                <View className="h-1.5 bg-slate-200 rounded-full">
-                  <View className="h-full bg-slate-300 w-[30%]" />
+                <View className="h-1.5 rounded-full bg-slate-200">
+                  <View className="h-full bg-slate-300" style={{ width: `${timeProgress}%` }} />
                 </View>
               </View>
             </View>
@@ -81,53 +157,44 @@ export default function HomeScreen() {
         </View>
 
         {/* Subjects Section */}
-        <View className="px-6 mb-4">
-          <Text className="text-xl font-bold mb-4">Progressmu</Text>
+        <View className="mb-4 px-6">
+          <Text className="mb-4 text-xl font-bold">Progressmu</Text>
           <View className="flex-row flex-wrap gap-4">
-            <SubjectCard emoji="📐" title="Matematika" progress={0} />
-            <SubjectCard emoji="⚡" title="Fisika" progress={0} />
-            <SubjectCard emoji="🧪" title="Kimia" progress={0} />
-            <SubjectCard emoji="🧬" title="Biologi" progress={0} />
+            {subjects.map((s) => (
+              <SubjectCard 
+                key={s._id}
+                slug={s.slug}
+                emoji={s.icon} 
+                title={s.title} 
+                progress={s.progress} 
+                color={s.color}
+                variant="compact"
+              />
+            ))}
           </View>
         </View>
       </ScrollView>
 
       {/* Sticky Floating Action Banner */}
       <View className="absolute bottom-6 left-6 right-6">
-         <Button 
-           size="lg" 
-           className="h-20" 
-           onPress={() => router.push('/(tabs)/subjects')}
-          >
-            <View className="flex-1 flex-row items-center">
-                <View className="bg-white/20 p-2.5 rounded-2xl mr-4 aspect-square items-center justify-center">
-                    <Text className="text-2xl">✨</Text>
-                </View>
-                <View className="flex-1">
-                    <Text className="text-white font-bold text-lg leading-tight">Mulai Belajar</Text>
-                    <Text className="text-white/80 text-sm">Pilih pelajaran pertamamu!</Text>
-                </View>
-                <Icon as={ChevronRight} size={20} className="text-white" />
+        <Button size="lg" className="h-20" onPress={handleStartLearning}>
+          <View className="flex-1 flex-row items-center">
+            <View className="mr-4 aspect-square items-center justify-center rounded-2xl bg-white/20 p-2.5">
+              <Text className="text-2xl">{lastStudy ? "📚" : "✨"}</Text>
             </View>
-         </Button>
+            <View className="flex-1">
+              <Text className="text-lg font-bold leading-tight text-white">
+                {lastStudy ? "Lanjutkan Belajar" : "Mulai Belajar"}
+              </Text>
+              <Text className="text-sm text-white/80" numberOfLines={1}>
+                {lastStudy ? lastStudy.title : "Pilih pelajaran pertamamu!"}
+              </Text>
+            </View>
+            <ChevronRight size={20} className="text-white" />
+          </View>
+        </Button>
       </View>
     </View>
   );
 }
 
-function SubjectCard({ emoji, title, progress }: { emoji: string, title: string, progress: number }) {
-  return (
-    <TouchableOpacity 
-      activeOpacity={0.9}
-      style={{ width: CARD_WIDTH }}
-    >
-      <Card contentClassName="aspect-square p-5 items-center justify-center">
-        <View className="bg-slate-50 dark:bg-slate-800 p-4 rounded-full mb-3 aspect-square items-center justify-center">
-          <Text className="text-3xl">{emoji}</Text>
-        </View>
-        <Text className="font-bold text-center mb-1 text-sm">{title}</Text>
-        <Text className="text-xs text-muted-foreground">{progress}%</Text>
-      </Card>
-    </TouchableOpacity>
-  );
-}

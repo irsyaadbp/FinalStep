@@ -11,6 +11,7 @@ interface AuthContextType {
   login: (data: LoginInput) => Promise<void>;
   register: (data: RegisterInput) => Promise<void>;
   logout: () => Promise<void>;
+  refreshUser: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -71,7 +72,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const response = await authService.login(data);
     if (response.success && response.data) {
       await SecureStore.setItemAsync(TOKEN_KEY, response.data.token);
-      setUser(response.data.user);
+      const profile = await authService.getMe()
+      setUser(profile.data as UserData);
     } else {
       throw new Error(response.message || 'Login failed');
     }
@@ -96,6 +98,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const refreshUser = async () => {
+    try {
+      const response = await authService.getMe();
+      if (response.success && response.data) {
+        setUser(response.data);
+      }
+    } catch (error) {
+      console.error('Failed to refresh user:', error);
+    }
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -105,6 +118,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         login,
         register,
         logout,
+        refreshUser,
       }}
     >
       {children}

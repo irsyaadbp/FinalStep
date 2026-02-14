@@ -40,7 +40,7 @@ export function SubjectCard({ subject, index }: SubjectCardProps) {
           }`}
         >
           <CardContent className="flex flex-col items-center p-4 gap-2">
-            <div className="relative flex items-center justify-center">
+            <div className="relative flex items-center justify-center rounded-full">
               <svg width="76" height="76" className="-rotate-90">
                 <circle
                   cx="38"

@@ -3,7 +3,8 @@ import {
   getQuiz,
   createQuiz,
   updateQuiz,
-  deleteQuiz
+  deleteQuiz,
+  submitQuiz
 } from '../controllers/quiz.controller';
 import { protect } from '../middlewares/auth';
 import { admin } from '../middlewares/admin';
@@ -14,6 +15,7 @@ const router = Router({ mergeParams: true });
 
 // Public routes (Auth required)
 router.get('/', protect, getQuiz);
+router.post('/submit', protect, submitQuiz);
 
 // Admin routes
 router.post('/', protect, admin, validate(quizSchema), createQuiz);

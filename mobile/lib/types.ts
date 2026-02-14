@@ -49,6 +49,7 @@ export interface Subject {
   totalChapters?: number;
   totalQuizzes?: number;
   completedChapters?: number;
+  chapters?: Chapter[];
 }
 
 // Chapters / Materials

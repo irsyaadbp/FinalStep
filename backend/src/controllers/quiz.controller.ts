@@ -79,8 +79,58 @@ export const deleteQuiz = async (req: Request, res: Response, next: NextFunction
     if (!quiz) {
       return res.status(404).json(error('Quiz not found'));
     }
-
     res.json(success('Quiz deleted (archived)'));
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const submitQuiz = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { subjectSlug, chapterSlug } = req.params as { subjectSlug: string; chapterSlug: string };
+    const { answers } = req.body as { answers: number[] };
+    const userId = req.user?._id;
+
+    if (!userId) {
+      return res.status(401).json(error('Unauthorized'));
+    }
+
+    const quiz = await Quiz.findOne({ subjectSlug, chapterSlug, isActive: true });
+    if (!quiz) {
+      return res.status(404).json(error('Quiz not found'));
+    }
+
+    let correctCount = 0;
+    quiz.questions.forEach((q, index) => {
+      if (answers[index] === q.correctAnswer) {
+        correctCount++;
+      }
+    });
+
+    const xpEarned = correctCount * 10; // 10 XP per correct answer
+
+    // Update User Progress
+    // We can likely reuse completeQuiz logic from progress controller or just do it here for now
+    // Ideally we should have a service layer, but controller is fine for now.
+    
+    // We will just return the result for now, and let the client call completeQuiz 
+    // OR we can update it here.
+    // The mobile app calls progressService.completeQuiz separately in `handleQuizComplete`.
+    // However, the mobile app expects `submitQuiz` to return xpEarned and correctCount.
+    
+    // The previous implementation in mobile `QuizView` handleSubmit:
+    // 1. calls quizService.submitQuiz -> gets result
+    // 2. calls onComplete -> handleQuizComplete -> calls progressService.completeQuiz
+
+    // So this endpoint strictly just calculates score.
+    // BUT the gamification logic (XP) should probably be persisted here if we want security.
+    // For now, let's just return the calc.
+
+    res.json(success('Quiz submitted', {
+      correctCount,
+      totalQuestions: quiz.questions.length,
+      xpEarned
+    }));
   } catch (err) {
     next(err);
   }
