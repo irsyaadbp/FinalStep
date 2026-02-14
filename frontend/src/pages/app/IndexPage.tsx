@@ -15,6 +15,7 @@ import {
   Zap,
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
+import { settingsService, type Settings } from "@/service/settings";
 import { subjectService } from "@/service/subject";
 import { useAsyncFetch } from "@/hooks/useAsyncFetch";
 import { type Subject } from "@/types/shared";
@@ -25,16 +26,20 @@ export default function IndexPage() {
   const [subjects, setSubjects] = useState<(Subject & { progress: number })[]>(
     [],
   );
+  const [settings, setSettings] = useState<Settings | null>(null);
 
   useAsyncFetch(
     async () => {
-      return await subjectService.getSubjects();
+      return await Promise.all([
+        subjectService.getSubjects(),
+        settingsService.getSettings()
+      ]);
     },
     {
-      onSuccess: (res) => {
-        if (res.data && user) {
+      onSuccess: ([resSubjects, resSettings]) => {
+        if (resSubjects.data && user) {
           // Map backend subjects with user progress
-          const subjectsWithProgress = res.data.map((s) => {
+          const subjectsWithProgress = resSubjects.data.map((s) => {
             const userProgress = user.progress?.find(
               (p) => p.subjectSlug === s.slug,
             );
@@ -46,9 +51,15 @@ export default function IndexPage() {
           });
           setSubjects(subjectsWithProgress);
         }
+        
+        if (resSettings.data) {
+          setSettings(resSettings.data);
+        }
       },
     },
   );
+
+  // ... (user consts)
 
   const name = user?.name.split(" ")[0] || "Student";
   const streak = user?.streak || 0;
@@ -74,8 +85,15 @@ export default function IndexPage() {
 
   const lastStudy = user?.lastStudy;
 
-  const daysLeft = 12; // This could be dynamic if we have a target date
-  const timeProgress = 30; // Dummy for now, or based on time since start
+  // Dynamic calculations based on settings
+  const daysLeft = settings?.examDate ? (() => {
+    const target = new Date(settings.examDate);
+    const now = new Date();
+    const diff = target.getTime() - now.getTime();
+    return Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)));
+  })() : 0;
+
+  const timeProgress = settings?.targetThreshold || 0;
 
   return (
     <div className="space-y-6">
