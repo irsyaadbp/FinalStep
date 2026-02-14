@@ -135,6 +135,13 @@ export interface ApiResponse<T = any> {
   errors?: { [k: string]: string[] };
 }
 
+
+export interface Settings {
+  key: string;
+  examDate: string;
+  targetThreshold: number;
+}
+
 export interface UserData {
   _id: string;
   name: string;

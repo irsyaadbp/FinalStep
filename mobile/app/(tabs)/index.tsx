@@ -13,6 +13,7 @@ import { useAsyncFetch } from '@/hooks/useAsyncFetch';
 import { subjectService } from '@/services/subject';
 import { Subject } from '@/lib/types';
 import { SubjectCard } from '@/components/ui/subject-card';
+import { settingsService } from '@/services/settings';
 
 const { width } = Dimensions.get('window');
 const CARD_WIDTH = (width - 48 - 16) / 2;
@@ -21,6 +22,7 @@ export default function HomeScreen() {
   const { user, refreshUser } = useAuth();
   const router = useRouter();
   const [refreshing, setRefreshing] = React.useState(false);
+  const [settings, setSettings] = React.useState<any>(null);
 
   const { data: subjectsData, execute: refreshSubjects } = useAsyncFetch(
     async () => {
@@ -28,11 +30,22 @@ export default function HomeScreen() {
     }
   );
 
+  const { execute: fetchSettings } = useAsyncFetch(
+    async () => {
+      return await settingsService.getSettings();
+    },
+    {
+      onSuccess: (res) => {
+        if (res.data) setSettings(res.data);
+      }
+    }
+  );
+
   const onRefresh = React.useCallback(async () => {
     setRefreshing(true);
-    await Promise.all([refreshUser(), refreshSubjects()]);
+    await Promise.all([refreshUser(), refreshSubjects(), fetchSettings()]);
     setRefreshing(false);
-  }, [refreshUser, refreshSubjects]);
+  }, [refreshUser, refreshSubjects, fetchSettings]);
 
   const subjects = React.useMemo(() => {
     if (!subjectsData?.data || !user) return [];
@@ -55,8 +68,16 @@ export default function HomeScreen() {
   const overallProgress = totalChapters > 0 ? Math.round((completedChapters / totalChapters) * 100) : 0;
   const lastStudy = user?.lastStudy;
 
-  const daysLeft = 12; // Static for now matching frontend
-  const timeProgress = 30; // Static for now matching frontend
+  // Dynamic calculations based on settings
+  const daysLeft = React.useMemo(() => {
+    if (!settings?.examDate) return 0;
+    const target = new Date(settings.examDate);
+    const now = new Date();
+    const diff = target.getTime() - now.getTime();
+    return Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)));
+  }, [settings]);
+
+  const timeProgress = settings?.targetThreshold || 0;
 
   const handleStartLearning = () => {
     if (!lastStudy) {
@@ -120,36 +141,49 @@ export default function HomeScreen() {
               />
             </View>
 
-            {/* Alert Card Inside (Flat Style) */}
-            <View className="mt-6 rounded-[24px] border border-slate-100 bg-slate-50 p-5 dark:border-slate-800 dark:bg-slate-800/50">
-              <View className="mb-3 flex-row items-center gap-3">
-                <View className="rounded-lg bg-orange-100 p-1.5">
-                  <Icon as={AlertTriangle} size={16} className="text-orange-500" />
+            {/* Alert Card & Progress Section */}
+            <View className="mt-6">
+              {/* Alert Box */}
+              <View className="mb-6 rounded-2xl bg-secondary p-4">
+                <View className="flex-row items-center gap-3 mb-1">
+                  <Icon as={AlertTriangle} size={24} className="text-orange-500" />
+                  <Text className="text-base font-bold text-slate-900 dark:text-slate-100">
+                    {dailyXP >= dailyGoal ? "Target Tercapai! 🎉" : "Perlu Kejar! ⚠️"}
+                  </Text>
                 </View>
-                <Text className="text-sm font-bold">
-                  {dailyXP >= dailyGoal ? "Target Tercapai! 🎉" : "Perlu Kejar! ⚠️"}
+                <Text className="text-xs font-medium text-slate-500 ml-9">
+                  {completedChapters}/{totalChapters} bab · {overallProgress}% selesai · 📅 {daysLeft} hari lagi
                 </Text>
-                <View className="flex-1" />
               </View>
-              <View className="mb-4 flex-row justify-between">
-                <Text className="text-xs text-muted-foreground">{completedChapters}/{totalChapters} bab</Text>
-                <Text className="text-xs text-muted-foreground">{overallProgress}% selesai</Text>
-                <Text className="text-xs text-muted-foreground">📅 {daysLeft} hari lagi</Text>
-              </View>
-              <View className="gap-2">
-                <View className="flex-row justify-between">
-                  <Text className="text-[10px] text-muted-foreground">Progres Kamu</Text>
-                  <Text className="text-[10px] font-bold text-primary">{overallProgress}%</Text>
+
+              {/* Progress Bars */}
+              <View className="gap-4">
+                {/* User Progress */}
+                <View className="gap-2">
+                  <View className="flex-row justify-between items-end">
+                    <Text className="text-xs font-medium text-slate-500">Progres Kamu</Text>
+                    <Text className="text-sm font-bold text-primary">{overallProgress}%</Text>
+                  </View>
+                  <View className="h-2 rounded-full bg-slate-100 dark:bg-slate-800">
+                    <View 
+                      className="h-full rounded-full bg-primary" 
+                      style={{ width: `${overallProgress}%` }} 
+                    />
+                  </View>
                 </View>
-                <View className="h-1.5 rounded-full bg-slate-200">
-                  <View className="h-full bg-primary" style={{ width: `${overallProgress}%` }} />
-                </View>
-                <View className="flex-row justify-between">
-                  <Text className="text-[10px] text-muted-foreground">Target Ideal</Text>
-                  <Text className="text-[10px] font-bold text-slate-400">{timeProgress}%</Text>
-                </View>
-                <View className="h-1.5 rounded-full bg-slate-200">
-                  <View className="h-full bg-slate-300" style={{ width: `${timeProgress}%` }} />
+
+                {/* Target Ideal */}
+                <View className="gap-2">
+                  <View className="flex-row justify-between items-end">
+                    <Text className="text-xs font-medium text-slate-500">Target Ideal</Text>
+                    <Text className="text-sm font-bold text-slate-400">{timeProgress}%</Text>
+                  </View>
+                  <View className="h-2 rounded-full bg-slate-100 dark:bg-slate-800">
+                    <View 
+                      className="h-full rounded-full bg-slate-300 dark:bg-slate-600" 
+                      style={{ width: `${timeProgress}%` }} 
+                    />
+                  </View>
                 </View>
               </View>
             </View>
