@@ -14,7 +14,7 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default: cn(
-          'bg-primary rounded-2xl active:bg-primary/90',
+          'bg-primary disabled:bg-[#A599E1] rounded-2xl active:bg-primary/90',
           Platform.select({ web: 'hover:bg-primary/90' })
         ),
         destructive: cn(
@@ -106,7 +106,7 @@ function Button({ className, variant, size, ...props }: ButtonProps) {
   const pressable = (
     <Pressable
       className={cn(
-        props.disabled && 'opacity-50',
+        // props.disabled && 'opacity-50',
         buttonVariants({ variant, size }),
         radiusClass,
         hasShadowLayer && 'w-full',
@@ -135,10 +135,10 @@ function Button({ className, variant, size, ...props }: ButtonProps) {
   }
 
   const getShadowColor = () => {
-    if (isDefault) return 'bg-[#3D2AA8]';
-    if (isSecondary) return 'bg-[#e9e9e9]';
-    if (isDestructive) return 'bg-[#B91C1C]'; // Darker red for shadow
-    return 'bg-[#e9e9e9]';
+    if (isDefault) return props.disabled ? 'bg-[#9689C5]' : 'bg-[#3D2AA8]';
+    if (isSecondary) return props.disabled ? 'bg-[#e9e9e9]/20' : 'bg-[#e9e9e9]';
+    if (isDestructive) return props.disabled ? 'bg-[#B91C1C]/20' : 'bg-[#B91C1C]'; // Darker red for shadow
+    return props.disabled ? 'bg-[#e9e9e9]/20' : 'bg-[#e9e9e9]';
   };
 
   return (
