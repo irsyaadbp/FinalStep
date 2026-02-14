@@ -11,8 +11,12 @@ import quizRoutes from './quiz.routes';
 import finalExamRoutes from './finalExam.routes';
 import progressRoutes from './progress.routes';
 import settingsRoutes from './settings.routes';
+import userRoutes from './user.routes';
+import dashboardRoutes from './dashboard.routes';
 
 router.use('/auth', authRoutes);
+router.use('/users', userRoutes);
+router.use('/dashboard', dashboardRoutes);
 router.use('/subjects', subjectRoutes);
 router.use('/subjects/:subjectSlug/chapters', chapterRoutes);
 router.use('/subjects/:subjectSlug/chapters/:chapterSlug/quiz', quizRoutes);

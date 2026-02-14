@@ -1,5 +1,7 @@
 import { useState } from "react";
-import { students } from "../data";
+// import { students } from "../data";
+import { useAsyncFetch } from "@/hooks/useAsyncFetch";
+import { userService } from "@/service/user";
 import { Card, CardContent } from "@/components/ui/Card";
 import {
   Table,
@@ -25,9 +27,41 @@ const ITEMS_PER_PAGE = 5;
 export default function StudentsPage() {
   const [currentPage, setCurrentPage] = useState(1);
 
-  const totalPages = Math.ceil(students.length / ITEMS_PER_PAGE);
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+  const [fetchedStudents, setFetchedStudents] = useState<any[]>([]);
+
+  const { execute: fetchStudents, isLoading } = useAsyncFetch(
+    async () => {
+      return await userService.getStudents();
+    },
+    {
+      onSuccess: (res) => {
+        const data = res.data || [];
+        const transformed = data.map((s: any) => {
+            const totalProgress = s.progress?.reduce((acc: number, curr: any) => acc + curr.progressPercent, 0) || 0;
+            const avgProgress = s.progress?.length ? Math.round(totalProgress / s.progress.length) : 0;
+            return {
+                ...s,
+                id: s._id,
+                progress: avgProgress,
+                school: s.school || "-",
+                targetUniversity: s.targetUniversity || "-",
+            };
+        });
+        setFetchedStudents(transformed);
+      },
+    }
+  );
+
+  /* eslint-disable-next-line react-hooks/exhaustive-deps */
+  useState(() => {
+    fetchStudents();
+  });
+
+  const displayStudents = fetchedStudents.length > 0 ? fetchedStudents : [];
+  const totalPages = Math.ceil(displayStudents.length / ITEMS_PER_PAGE);
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-  const paginatedStudents = students.slice(
+  const paginatedStudents = displayStudents.slice(
     startIndex,
     startIndex + ITEMS_PER_PAGE,
   );
@@ -40,13 +74,21 @@ export default function StudentsPage() {
     if (currentPage > 1) setCurrentPage((prev) => prev - 1);
   };
 
+  if (isLoading) {
+      return (
+          <div className="flex h-96 items-center justify-center">
+              <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+          </div>
+      );
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="font-display text-2xl font-bold">Daftar Siswa</h1>
           <p className="text-muted-foreground text-sm mt-1">
-            {students.length} siswa kelas 12 terdaftar
+            {displayStudents.length} siswa kelas 12 terdaftar
           </p>
         </div>
       </div>
@@ -183,9 +225,9 @@ export default function StudentsPage() {
         <p className="text-sm text-muted-foreground">
           Menampilkan <span className="font-medium">{startIndex + 1}</span> -{" "}
           <span className="font-medium">
-            {Math.min(startIndex + ITEMS_PER_PAGE, students.length)}
+            {Math.min(startIndex + ITEMS_PER_PAGE, displayStudents.length)}
           </span>{" "}
-          dari <span className="font-medium">{students.length}</span> siswa
+          dari <span className="font-medium">{displayStudents.length}</span> siswa
         </p>
         <div className="flex items-center gap-2">
           <Button
