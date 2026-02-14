@@ -10,6 +10,7 @@ import {
   BookOpen,
   ClipboardList,
   ArrowRight,
+  Loader2,
 } from "lucide-react";
 import { Card } from "../../../components/ui/Card";
 import { Button } from "../../../components/ui/Button";
@@ -29,7 +30,7 @@ export default function SubjectDetailPage() {
   const [chapters, setChapters] = useState<Chapter[]>([]);
   const [finalExam, setFinalExam] = useState<FinalExam | null>(null);
 
-  useAsyncFetch(
+  const { isLoading: isSubjectLoading } = useAsyncFetch(
     async () => {
       if (!slug) return null;
       return await subjectService.getSubjects();
@@ -47,7 +48,7 @@ export default function SubjectDetailPage() {
     }
   );
 
-  useAsyncFetch(
+  const { isLoading: isChaptersLoading } = useAsyncFetch(
     async () => {
       if (!slug) return [];
       return await chapterService.getChapters(slug);
@@ -61,7 +62,7 @@ export default function SubjectDetailPage() {
     }
   );
 
-  useAsyncFetch(
+  const { isLoading: isExamLoading } = useAsyncFetch(
     async () => {
       if (!slug) return null;
       return await finalExamService.getFinalExam(slug);
@@ -89,6 +90,14 @@ export default function SubjectDetailPage() {
       unlocked: isUnlocked
     };
   });
+
+  if (isSubjectLoading || isChaptersLoading || isExamLoading) {
+    return (
+      <div className="flex min-h-[60vh] items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   if (!subject) {
     return (

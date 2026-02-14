@@ -8,6 +8,7 @@ import {
   XCircle,
   CheckCircle2,
   Clock,
+  Loader2,
 } from "lucide-react";
 import { Button } from "../../../components/ui/Button";
 import { Card } from "../../../components/ui/Card";
@@ -45,7 +46,7 @@ export default function SubjectMaterialPage() {
   const [timeLeft, setTimeLeft] = useState<number | null>(null);
 
   // Fetch Subject & Chapters
-  useAsyncFetch(
+  const { isLoading: isSubjectLoading } = useAsyncFetch(
     async () => {
       if (!slug) return null;
       return await subjectService.getSubjects();
@@ -60,7 +61,7 @@ export default function SubjectMaterialPage() {
     },
   );
 
-  useAsyncFetch(
+  const { isLoading: isChaptersLoading } = useAsyncFetch(
     async () => {
       if (!slug) return [];
       return await chapterService.getChapters(slug);
@@ -75,7 +76,7 @@ export default function SubjectMaterialPage() {
   );
 
   // Fetch Final Exam
-  useAsyncFetch(
+  const { isLoading: isExamLoading } = useAsyncFetch(
     async () => {
       if (!slug) return null;
       return await finalExamService.getFinalExam(slug);
@@ -282,6 +283,14 @@ export default function SubjectMaterialPage() {
     const secs = seconds % 60;
     return `${mins}:${secs.toString().padStart(2, "0")}`;
   };
+
+  if (isSubjectLoading || isChaptersLoading || isExamLoading) {
+    return (
+      <div className="flex min-h-[60vh] items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   if (!subject || (!activeChapter && !finalExam)) {
     return (
