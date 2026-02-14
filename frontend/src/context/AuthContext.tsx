@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import { authService } from "../service/auth";
-import { TOKEN_KEY, type UserData, type AuthResponse } from "@finalstep/shared";
+import { TOKEN_KEY, type UserData, type AuthResponse } from "@/types/shared";
 
 interface AuthContextType {
   user: UserData | null;

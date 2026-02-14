@@ -1,5 +1,5 @@
 import { $fetch } from "./$fetch";
-import { type ApiResponse, type Subject, type SubjectInput } from "@finalstep/shared";
+import { type ApiResponse, type Subject, type SubjectInput } from "@/types/shared";
 
 export const subjectService = {
   // Get all subjects

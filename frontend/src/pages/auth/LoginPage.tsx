@@ -2,7 +2,7 @@ import { motion } from "motion/react";
 import { GraduationCap, Mail, Lock } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { loginSchema, type LoginInput } from "@finalstep/shared";
+import { loginSchema, type LoginInput } from "@/types/shared";
 import {
   FormGenerator,
   type FormField,
@@ -11,7 +11,7 @@ import { Button } from "../../components/ui/Button";
 import { Link, useNavigate } from "react-router";
 import { useAsyncFetch } from "../../hooks/useAsyncFetch";
 import { authService } from "../../service/auth";
-import { type AuthResponse } from "@finalstep/shared";
+import { type AuthResponse } from "@/types/shared";
 import { toast } from "sonner";
 import { useAuth } from "../../context/AuthContext";
 

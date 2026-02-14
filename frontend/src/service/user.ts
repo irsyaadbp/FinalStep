@@ -1,6 +1,6 @@
 import { $fetch } from "./$fetch";
-import { type ApiResponse } from "@finalstep/shared";
-import { type UserData } from "@finalstep/shared";
+import { type ApiResponse } from "@/types/shared";
+import { type UserData } from "@/types/shared";
 
 export interface Student extends Omit<UserData, 'progress'> {
   xp: number;

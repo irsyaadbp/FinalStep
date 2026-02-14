@@ -18,7 +18,7 @@ import { subjectService } from "@/service/subject";
 import { chapterService } from "@/service/chapter";
 import { finalExamService } from "@/service/finalExam";
 import { useAsyncFetch } from "@/hooks/useAsyncFetch";
-import { type Subject, type Chapter, type FinalExam } from "@finalstep/shared";
+import { type Subject, type Chapter, type FinalExam } from "@/types/shared";
 
 export default function SubjectDetailPage() {
   const { slug } = useParams();

@@ -18,7 +18,7 @@ import { quizService } from "@/service/quiz";
 import { finalExamService } from "@/service/finalExam";
 import { progressService } from "@/service/progress";
 import { useAsyncFetch } from "@/hooks/useAsyncFetch";
-import { type Subject, type Chapter, type Quiz, type FinalExam } from "@finalstep/shared";
+import { type Subject, type Chapter, type Quiz, type FinalExam } from "@/types/shared";
 import { toast } from "sonner";
 
 type ViewMode = "reading" | "quiz" | "finalExam" | "completed";

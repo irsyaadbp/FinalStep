@@ -1,5 +1,5 @@
 import { $fetch } from "./$fetch";
-import { type ApiResponse } from "@finalstep/shared";
+import { type ApiResponse } from "@/types/shared";
 
 export const progressService = {
   completeChapter: (subjectSlug: string, chapterSlug: string) => {

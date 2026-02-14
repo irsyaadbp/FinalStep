@@ -10,12 +10,12 @@ import {
 } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { registerSchema, type RegisterInput, TOKEN_KEY } from "@finalstep/shared";
+import { registerSchema, type RegisterInput } from "@/types/shared";
 import { FormGenerator, type FormField } from "../../components/common/FormGenerator";
 import { Button } from "../../components/ui/Button";
 import { useAsyncFetch } from "../../hooks/useAsyncFetch";
 import { authService } from "../../service/auth";
-import { type AuthResponse } from "@finalstep/shared";
+import { type AuthResponse } from "@/types/shared";
 import { toast } from "sonner";
 import { useAuth } from "../../context/AuthContext";
 

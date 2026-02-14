@@ -41,7 +41,7 @@ import {
   type ChapterInput as ChapterFormValues,
   type FinalExamInput as FinalExamFormValues,
   type Subject,
-} from "@finalstep/shared";
+} from "@/types/shared";
 import {
   FormGenerator,
   type FormField,

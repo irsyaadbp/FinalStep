@@ -173,5 +173,3 @@ export interface AuthData {
 }
 
 export type AuthResponse = ApiResponse<AuthData>;
-
-

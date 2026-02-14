@@ -1,4 +1,4 @@
-import { TOKEN_KEY } from '@finalstep/shared';
+import { TOKEN_KEY } from '@/types/shared';
 
 export interface FetchOptions extends Omit<RequestInit, 'body'> {
   body?: unknown;

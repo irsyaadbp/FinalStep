@@ -1,5 +1,5 @@
 import { $fetch } from './$fetch';
-import { type Quiz, type QuizInput, type ApiResponse } from '@finalstep/shared';
+import { type Quiz, type QuizInput, type ApiResponse } from '@/types/shared';
 
 export const quizService = {
   getQuiz: (subjectSlug: string, chapterSlug: string) => {

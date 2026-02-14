@@ -5,12 +5,11 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "npm run build --prefix ../shared && tsc -b && vite build",
+    "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview"
   },
   "dependencies": {
-    "@finalstep/shared": "file:../shared",
     "@hookform/resolvers": "^5.2.2",
     "@radix-ui/react-avatar": "^1.1.11",
     "@radix-ui/react-dialog": "^1.1.15",
@@ -22,6 +21,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
+    "isomorphic-dompurify": "^3.0.0-rc.2",
     "lucide-react": "^0.563.0",
     "motion": "^12.34.0",
     "react": "^19.2.0",

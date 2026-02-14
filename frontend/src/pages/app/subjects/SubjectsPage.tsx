@@ -4,7 +4,7 @@ import { SubjectCard } from "../../../components/app/SubjectCard";
 import { useAuth } from "@/context/AuthContext";
 import { subjectService } from "@/service/subject";
 import { useAsyncFetch } from "@/hooks/useAsyncFetch";
-import { type Subject } from "@finalstep/shared";
+import { type Subject } from "@/types/shared";
 
 export default function SubjectsPage() {
   const { user } = useAuth();

@@ -24,7 +24,7 @@ import {
   subjectSchema,
   type Subject,
   type SubjectInput as SubjectFormValues,
-} from "@finalstep/shared";
+} from "@/types/shared";
 import {
   FormGenerator,
   type FormField,

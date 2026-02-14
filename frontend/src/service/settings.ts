@@ -1,5 +1,5 @@
 import { $fetch } from "./$fetch";
-import { type ApiResponse } from "@finalstep/shared";
+import { type ApiResponse } from "@/types/shared";
 
 export interface Settings {
   key: string;

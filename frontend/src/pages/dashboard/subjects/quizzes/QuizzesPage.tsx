@@ -21,7 +21,7 @@ import {
   type Subject,
   type Chapter,
   type Quiz,
-} from "@finalstep/shared";
+} from "@/types/shared";
 import { cn } from "../../../../lib/utils";
 import { useAsyncFetch } from "../../../../hooks/useAsyncFetch";
 import { subjectService } from "../../../../service/subject";

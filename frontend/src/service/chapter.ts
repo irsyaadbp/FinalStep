@@ -1,5 +1,5 @@
 import { $fetch } from "./$fetch";
-import { type ApiResponse, type Chapter, type ChapterInput } from "@finalstep/shared";
+import { type ApiResponse, type Chapter, type ChapterInput } from "@/types/shared";
 
 export const chapterService = {
   // Get all chapters for a subject

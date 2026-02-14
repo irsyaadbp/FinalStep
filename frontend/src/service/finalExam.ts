@@ -1,5 +1,5 @@
 import { $fetch } from "./$fetch";
-import { type ApiResponse, type FinalExam, type FinalExamInput } from "@finalstep/shared";
+import { type ApiResponse, type FinalExam, type FinalExamInput } from "@/types/shared";
 
 export const finalExamService = {
   // Get final exam for a subject
