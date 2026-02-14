@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { Chapter } from '../models';
 import { success, error } from '../utils/response';
-import { ChapterInput, sanitizeHtml } from '@finalstep/shared';
+import { ChapterInput, sanitizeHtml } from '../types/shared';
 
 export const getChapters = async (req: Request, res: Response, next: NextFunction) => {
   try {

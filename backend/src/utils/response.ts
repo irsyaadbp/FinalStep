@@ -1,4 +1,4 @@
-import { ApiResponse } from '@finalstep/shared';
+import { ApiResponse } from '../types/shared';
 
 export const success = <T>(message: string, data?: T): ApiResponse<T> => {
   return {

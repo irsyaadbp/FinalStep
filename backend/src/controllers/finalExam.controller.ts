@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { FinalExam } from '../models';
 import { success, error } from '../utils/response';
-import { FinalExamInput } from '@finalstep/shared';
+import { FinalExamInput } from '../types/shared';
 
 export const getFinalExam = async (req: Request, res: Response, next: NextFunction) => {
   try {

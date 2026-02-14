@@ -8,7 +8,7 @@ import {
 import { protect } from '../middlewares/auth';
 import { admin } from '../middlewares/admin';
 import { validate } from '../middlewares/validate';
-import { finalExamSchema } from '@finalstep/shared'; // Need to ensure finalExamSchema is exported
+import { finalExamSchema } from '../types/shared'; // Need to ensure finalExamSchema is exported
 
 const router = Router({ mergeParams: true });
 

@@ -9,7 +9,7 @@ import {
 import { protect } from '../middlewares/auth';
 import { admin } from '../middlewares/admin';
 import { validate } from '../middlewares/validate';
-import { chapterSchema } from '@finalstep/shared'; // Need to ensure chapterSchema is exported in shared
+import { chapterSchema } from '../types/shared'; // Need to ensure chapterSchema is exported in shared
 
 const router = Router({ mergeParams: true });
 

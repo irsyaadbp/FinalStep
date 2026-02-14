@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { Quiz } from '../models';
 import { success, error } from '../utils/response';
-import { QuizInput } from '@finalstep/shared';
+import { QuizInput } from '../types/shared';
 
 export const getQuiz = async (req: Request, res: Response, next: NextFunction) => {
   try {

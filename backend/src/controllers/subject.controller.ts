@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { Subject } from '../models';
 import { success, error } from '../utils/response';
-import { SubjectInput } from '@finalstep/shared';
+import { SubjectInput } from '../types/shared';
 
 // Public: List all active subjects with counts
 export const getSubjects = async (req: Request, res: Response, next: NextFunction) => {

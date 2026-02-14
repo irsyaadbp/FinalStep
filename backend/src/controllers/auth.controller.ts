@@ -3,7 +3,7 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { User } from '../models';
 import { success, error } from '../utils/response';
-import { RegisterInput, LoginInput } from '@finalstep/shared';
+import { RegisterInput, LoginInput } from '../types/shared';
 
 const generateToken = (id: string, role: string) => {
   return jwt.sign({ id, role }, process.env.JWT_SECRET as string, {

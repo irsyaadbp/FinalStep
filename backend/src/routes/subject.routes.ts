@@ -9,7 +9,7 @@ import {
 import { protect } from '../middlewares/auth';
 import { admin } from '../middlewares/admin';
 import { validate } from '../middlewares/validate';
-import { subjectSchema } from '@finalstep/shared';
+import { subjectSchema } from '../types/shared';
 
 const router = Router();
 
