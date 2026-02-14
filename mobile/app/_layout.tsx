@@ -9,29 +9,18 @@ import { StatusBar } from 'expo-status-bar';
 import { useColorScheme } from 'nativewind';
 import * as React from 'react';
 
-export {
-  // Catch any errors thrown by the Layout component.
-  ErrorBoundary,
-} from 'expo-router';
+import { AuthProvider } from '@/context/AuthContext';
 
 export default function RootLayout() {
   const { colorScheme } = useColorScheme();
-  const [isReady, setIsReady] = React.useState(false);
-
-  if (!isReady) {
-    return (
-      <ThemeProvider value={NAV_THEME[colorScheme ?? 'light']}>
-        <StatusBar style="light" />
-        <SplashScreen onFinish={() => setIsReady(true)} />
-      </ThemeProvider>
-    );
-  }
 
   return (
-    <ThemeProvider value={NAV_THEME[colorScheme ?? 'light']}>
-      <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
-      <Stack screenOptions={{ headerShown: false }} />
-      <PortalHost />
-    </ThemeProvider>
+    <AuthProvider>
+      <ThemeProvider value={NAV_THEME[colorScheme ?? 'light']}>
+        <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
+        <Stack screenOptions={{ headerShown: false }} />
+        <PortalHost />
+      </ThemeProvider>
+    </AuthProvider>
   );
 }

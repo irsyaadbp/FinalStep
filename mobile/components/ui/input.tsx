@@ -5,14 +5,16 @@ import { Platform, TextInput, View, type TextInputProps } from 'react-native';
 type InputProps = TextInputProps &
   React.RefAttributes<TextInput> & {
     icon?: React.ReactNode;
+    error?: boolean;
   };
 
-function Input({ className, icon, ...props }: InputProps) {
+function Input({ className, icon, error, ...props }: InputProps) {
   return (
     <View
       className={cn(
         'flex-row items-center rounded-[20px] bg-background border-2 border-input px-4',
         'h-14',
+        error && 'border-destructive',
         className
       )}
     >

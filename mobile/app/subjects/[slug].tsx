@@ -105,7 +105,7 @@ export default function SubjectDetailScreen() {
         </ScrollView>
 
         {/* Sticky Action Button */}
-        <View className="absolute bottom-0 left-0 right-0 p-6 bg-white/80 dark:bg-slate-900/80 border-t border-slate-100 dark:border-slate-800">
+        <View className="absolute bottom-0 left-0 right-0 p-6">
            <Button 
              variant="default" 
              size="lg" 

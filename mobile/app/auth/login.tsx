@@ -8,9 +8,34 @@ import { GraduationCapIcon, MailIcon } from 'lucide-react-native';
 import { useColorScheme } from 'nativewind';
 import { View } from 'react-native';
 
+import { useForm, Controller } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { loginSchema, LoginInput } from '@/lib/types';
+import { useAuth } from '@/context/AuthContext';
+import { useState } from 'react';
+
 export default function LoginScreen() {
   const { colorScheme } = useColorScheme();
   const router = useRouter();
+  const { login } = useAuth();
+  const [error, setError] = useState<string | null>(null);
+
+  const { control, handleSubmit, formState: { errors, isSubmitting } } = useForm<LoginInput>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      email: '',
+      password: '',
+    },
+  });
+
+  const onSubmit = async (data: LoginInput) => {
+    try {
+      setError(null);
+      await login(data);
+    } catch (err: any) {
+      setError(err.message || 'Gagal masuk. Silakan coba lagi.');
+    }
+  };
 
   return (
     <View className="flex-1 bg-background items-center justify-center p-6">
@@ -33,24 +58,63 @@ export default function LoginScreen() {
       </View>
 
       <View className="w-full bg-white p-7 rounded-xl shadow-sm shadow-black/5 gap-6 border-2 border-border">
+        {error && (
+          <View className="bg-destructive/10 p-3 rounded-lg border border-destructive/20">
+            <Text className="text-destructive text-sm font-medium">{error}</Text>
+          </View>
+        )}
+
         <View className="gap-2">
           <Text className="font-bold ml-1">Email</Text>
-          <Input
-            icon={<Icon as={MailIcon} className="size-5 text-muted-foreground/40" />}
-            placeholder="ahmad@email.com"
-            keyboardType="email-address"
-            autoCapitalize="none"
+          <Controller
+            control={control}
+            name="email"
+            render={({ field: { onChange, onBlur, value } }) => (
+              <Input
+                icon={<Icon as={MailIcon} className="size-5 text-muted-foreground/40" />}
+                placeholder="ahmad@email.com"
+                keyboardType="email-address"
+                autoCapitalize="none"
+                onBlur={onBlur}
+                onChangeText={onChange}
+                value={value}
+                error={!!errors.email}
+              />
+            )}
           />
+          {errors.email && (
+            <Text className="text-destructive text-xs ml-1">{errors.email.message}</Text>
+          )}
         </View>
 
         <View className="gap-2">
           <Text className="font-bold ml-1">Password</Text>
-          <PasswordInput placeholder="••••••••" />
+          <Controller
+            control={control}
+            name="password"
+            render={({ field: { onChange, onBlur, value } }) => (
+              <PasswordInput 
+                placeholder="••••••••" 
+                onBlur={onBlur}
+                onChangeText={onChange}
+                value={value}
+                error={!!errors.password}
+              />
+            )}
+          />
+          {errors.password && (
+            <Text className="text-destructive text-xs ml-1">{errors.password.message}</Text>
+          )}
         </View>
 
         <View className="mt-2">
-          <Button size="lg" className="w-full" onPress={() => router.replace('/(tabs)')}>
-            <Text>MASUK</Text>
+          <Button 
+            size="lg" 
+            className="w-full" 
+            onPress={handleSubmit(onSubmit)}
+            disabled={isSubmitting}
+          >
+            <Text>{isSubmitting ? 'MEMPROSES...' : 'MASUK'}</Text>
           </Button>
         </View>
       </View>
