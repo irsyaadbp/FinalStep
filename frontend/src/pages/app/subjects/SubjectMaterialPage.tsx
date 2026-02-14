@@ -160,7 +160,7 @@ export default function SubjectMaterialPage() {
       await refreshUser();
       
       toast.success("Materi selesai! 🎉", {
-        description: viewMode === "finalExam" ? "Selamat! Kamu telah menyelesaikan subjek ini." : "+25 XP diperoleh",
+        description: viewMode === "finalExam" ? "Selamat! Kamu telah menyelesaikan mata pelajaran ini." : "+25 XP diperoleh",
       });
 
       if (nextChapter) {
@@ -456,7 +456,7 @@ export default function SubjectMaterialPage() {
                 Selamat! 🎉
               </h1>
               <p className="text-muted-foreground mb-8 mx-auto max-w-md">
-                Kamu telah menyelesaikan semua materi dalam subjek{" "}
+                Kamu telah menyelesaikan semua materi dalam mata pelajaran{" "}
                 <span className="font-bold text-foreground">
                   {subject.title}
                 </span>
@@ -487,7 +487,7 @@ export default function SubjectMaterialPage() {
                   Mulai Ujian Akhir
                 </Button>
                 <Button
-                  variant="outline"
+                  variant="secondary"
                   size="lg"
                   className="rounded-2xl font-bold h-12 px-8"
                   onClick={handleBackToSyllabus}
@@ -550,7 +550,7 @@ export default function SubjectMaterialPage() {
                     </Button>
                   )}
                   <Button
-                    className="rounded-xl flex-1 max-w-50 h-10 font-bold"
+                    className="rounded-xl flex-1 max-w-20 h-10 font-bold"
                     onClick={handleComplete}
                   >
                     {activeQuiz ? (
