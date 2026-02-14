@@ -30,33 +30,34 @@ export default function StudentsPage() {
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   const [fetchedStudents, setFetchedStudents] = useState<any[]>([]);
 
-  const { execute: fetchStudents, isLoading } = useAsyncFetch(
-    async () => {
-      return await userService.getStudents();
+  const { isLoading } = useAsyncFetch(
+    () => {
+      return userService.getStudents();
     },
     {
       onSuccess: (res) => {
         const data = res.data || [];
         const transformed = data.map((s: any) => {
-            const totalProgress = s.progress?.reduce((acc: number, curr: any) => acc + curr.progressPercent, 0) || 0;
-            const avgProgress = s.progress?.length ? Math.round(totalProgress / s.progress.length) : 0;
-            return {
-                ...s,
-                id: s._id,
-                progress: avgProgress,
-                school: s.school || "-",
-                targetUniversity: s.targetUniversity || "-",
-            };
+          const totalProgress =
+            s.progress?.reduce(
+              (acc: number, curr: any) => acc + curr.progressPercent,
+              0,
+            ) || 0;
+          const avgProgress = s.progress?.length
+            ? Math.round(totalProgress / s.progress.length)
+            : 0;
+          return {
+            ...s,
+            id: s._id,
+            progress: avgProgress,
+            school: s.school || "-",
+            targetUniversity: s.targetUniversity || "-",
+          };
         });
         setFetchedStudents(transformed);
       },
-    }
+    },
   );
-
-  /* eslint-disable-next-line react-hooks/exhaustive-deps */
-  useState(() => {
-    fetchStudents();
-  });
 
   const displayStudents = fetchedStudents.length > 0 ? fetchedStudents : [];
   const totalPages = Math.ceil(displayStudents.length / ITEMS_PER_PAGE);
@@ -75,11 +76,11 @@ export default function StudentsPage() {
   };
 
   if (isLoading) {
-      return (
-          <div className="flex h-96 items-center justify-center">
-              <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
-          </div>
-      );
+    return (
+      <div className="flex h-96 items-center justify-center">
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+      </div>
+    );
   }
 
   return (
@@ -227,7 +228,8 @@ export default function StudentsPage() {
           <span className="font-medium">
             {Math.min(startIndex + ITEMS_PER_PAGE, displayStudents.length)}
           </span>{" "}
-          dari <span className="font-medium">{displayStudents.length}</span> siswa
+          dari <span className="font-medium">{displayStudents.length}</span>{" "}
+          siswa
         </p>
         <div className="flex items-center gap-2">
           <Button
