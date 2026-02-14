@@ -42,10 +42,10 @@ export default function LoginScreen() {
       <Stack.Screen options={{ title: 'Login' }} />
 
       <View className="items-center gap-4 mb-10">
-        <View className="relative overflow-visible pb-2">
+        <View className="relative overflow-visible pb-2 size-16">
           {/* Logo 3D Shadow */}
-          <View className="absolute inset-x-0 top-2 h-full rounded-xl bg-[#3D2AA8]" />
-          <View className="bg-primary rounded-xl p-5">
+          <View className="absolute inset-x-0 top-2 h-full rounded-3xl bg-[#3D2AA8]" />
+          <View className="bg-primary rounded-3xl items-center justify-center h-full">
             <Icon as={GraduationCapIcon} size={40} className="text-white" />
           </View>
         </View>

@@ -4,12 +4,7 @@ import { Input } from '@/components/ui/input';
 import { PasswordInput } from '@/components/ui/password-input';
 import { Text } from '@/components/ui/text';
 import { Link, Stack, useRouter } from 'expo-router';
-import {
-  Building2Icon,
-  GraduationCapIcon,
-  MailIcon,
-  UserIcon,
-} from 'lucide-react-native';
+import { Building2Icon, GraduationCapIcon, MailIcon, UserIcon } from 'lucide-react-native';
 import { useColorScheme } from 'nativewind';
 import { ScrollView, View } from 'react-native';
 
@@ -25,7 +20,11 @@ export default function RegisterScreen() {
   const { register } = useAuth();
   const [error, setError] = useState<string | null>(null);
 
-  const { control, handleSubmit, formState: { errors, isSubmitting } } = useForm<RegisterInput>({
+  const {
+    control,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<RegisterInput>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
       name: '',
@@ -48,36 +47,35 @@ export default function RegisterScreen() {
   return (
     <ScrollView
       contentContainerStyle={{ flexGrow: 1, justifyContent: 'center' }}
-      className="bg-background"
-    >
+      className="bg-background">
       <Stack.Screen options={{ title: 'Register' }} />
 
       <View className="items-center justify-center p-6 py-12">
-        <View className="items-center gap-4 mb-10">
-          <View className="relative overflow-visible pb-2">
+        <View className="mb-10 items-center gap-4">
+          <View className="relative size-16 overflow-visible pb-2">
             {/* Logo 3D Shadow */}
-            <View className="absolute inset-x-0 top-2 h-full rounded-xl bg-[#3D2AA8]" />
-            <View className="bg-primary rounded-xl p-5">
+            <View className="absolute inset-x-0 top-2 h-full rounded-3xl bg-[#3D2AA8]" />
+            <View className="h-full items-center justify-center rounded-3xl bg-primary">
               <Icon as={GraduationCapIcon} size={40} className="text-white" />
             </View>
           </View>
           <View className="items-center">
-            <Text className="text-2xl font-bold text-center mb-1">Mulai Petualanganmu! 🌟</Text>
-            <Text className="text-muted-foreground text-center text-base">
+            <Text className="mb-1 text-center text-2xl font-bold">Mulai Petualanganmu! 🌟</Text>
+            <Text className="text-center text-base text-muted-foreground">
               Buat akun dan raih universitas impianmu
             </Text>
           </View>
         </View>
 
-        <View className="w-full bg-white p-7 rounded-xl shadow-sm shadow-black/5 gap-6 border-2 border-border">
+        <View className="w-full gap-6 rounded-xl border-2 border-border bg-white p-7 shadow-sm shadow-black/5">
           {error && (
-            <View className="bg-destructive/10 p-3 rounded-lg border border-destructive/20">
-              <Text className="text-destructive text-sm font-medium">{error}</Text>
+            <View className="rounded-lg border border-destructive/20 bg-destructive/10 p-3">
+              <Text className="text-sm font-medium text-destructive">{error}</Text>
             </View>
           )}
 
           <View className="gap-2">
-            <Text className="font-bold ml-1">Nama Lengkap</Text>
+            <Text className="ml-1 font-bold">Nama Lengkap</Text>
             <Controller
               control={control}
               name="name"
@@ -94,12 +92,12 @@ export default function RegisterScreen() {
               )}
             />
             {errors.name && (
-              <Text className="text-destructive text-xs ml-1">{errors.name.message}</Text>
+              <Text className="ml-1 text-xs text-destructive">{errors.name.message}</Text>
             )}
           </View>
 
           <View className="gap-2">
-            <Text className="font-bold ml-1">Email</Text>
+            <Text className="ml-1 font-bold">Email</Text>
             <Controller
               control={control}
               name="email"
@@ -117,18 +115,18 @@ export default function RegisterScreen() {
               )}
             />
             {errors.email && (
-              <Text className="text-destructive text-xs ml-1">{errors.email.message}</Text>
+              <Text className="ml-1 text-xs text-destructive">{errors.email.message}</Text>
             )}
           </View>
 
           <View className="gap-2">
-            <Text className="font-bold ml-1">Password</Text>
+            <Text className="ml-1 font-bold">Password</Text>
             <Controller
               control={control}
               name="password"
               render={({ field: { onChange, onBlur, value } }) => (
-                <PasswordInput 
-                  placeholder="••••••••" 
+                <PasswordInput
+                  placeholder="••••••••"
                   onBlur={onBlur}
                   onChangeText={onChange}
                   value={value}
@@ -137,12 +135,12 @@ export default function RegisterScreen() {
               )}
             />
             {errors.password && (
-              <Text className="text-destructive text-xs ml-1">{errors.password.message}</Text>
+              <Text className="ml-1 text-xs text-destructive">{errors.password.message}</Text>
             )}
           </View>
 
           <View className="gap-2">
-            <Text className="font-bold ml-1">Asal Sekolah</Text>
+            <Text className="ml-1 font-bold">Asal Sekolah</Text>
             <Controller
               control={control}
               name="school"
@@ -158,12 +156,12 @@ export default function RegisterScreen() {
               )}
             />
             {errors.school && (
-              <Text className="text-destructive text-xs ml-1">{errors.school.message}</Text>
+              <Text className="ml-1 text-xs text-destructive">{errors.school.message}</Text>
             )}
           </View>
 
           <View className="gap-2">
-            <Text className="font-bold ml-1">Universitas Impian</Text>
+            <Text className="ml-1 font-bold">Universitas Impian</Text>
             <Controller
               control={control}
               name="targetUniversity"
@@ -179,26 +177,27 @@ export default function RegisterScreen() {
               )}
             />
             {errors.targetUniversity && (
-              <Text className="text-destructive text-xs ml-1">{errors.targetUniversity.message}</Text>
+              <Text className="ml-1 text-xs text-destructive">
+                {errors.targetUniversity.message}
+              </Text>
             )}
           </View>
 
           <View className="mt-4">
-            <Button 
-              size="lg" 
-              className="w-full" 
+            <Button
+              size="lg"
+              className="w-full"
               onPress={handleSubmit(onSubmit)}
-              disabled={isSubmitting}
-            >
+              disabled={isSubmitting}>
               <Text>{isSubmitting ? 'MEMPROSES...' : 'DAFTAR SEKARANG'}</Text>
             </Button>
           </View>
         </View>
 
-        <View className="flex-row justify-center mt-10 pb-4">
+        <View className="mt-10 flex-row justify-center pb-4">
           <Text className="text-muted-foreground">Sudah punya akun? </Text>
           <Link href="/auth/login" asChild>
-            <Text className="text-primary font-bold">Masuk</Text>
+            <Text className="font-bold text-primary">Masuk</Text>
           </Link>
         </View>
       </View>
