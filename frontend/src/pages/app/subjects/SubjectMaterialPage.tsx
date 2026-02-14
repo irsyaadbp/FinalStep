@@ -550,7 +550,7 @@ export default function SubjectMaterialPage() {
                     </Button>
                   )}
                   <Button
-                    className="rounded-xl flex-1 max-w-20 h-10 font-bold"
+                    className="rounded-xl flex-1 max-w-50 h-10 font-bold"
                     onClick={handleComplete}
                   >
                     {activeQuiz ? (
