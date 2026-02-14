@@ -1,8 +1,10 @@
 import { Button } from '@/components/ui/button';
 import { Icon } from '@/components/ui/icon';
+import { Input } from '@/components/ui/input';
+import { PasswordInput } from '@/components/ui/password-input';
 import { Text } from '@/components/ui/text';
 import { Link, Stack } from 'expo-router';
-import { MoonStarIcon, StarIcon, SunIcon } from 'lucide-react-native';
+import { MailIcon, MoonStarIcon, SunIcon } from 'lucide-react-native';
 import { useColorScheme } from 'nativewind';
 import * as React from 'react';
 import { Image, type ImageStyle, View } from 'react-native';
@@ -14,6 +16,7 @@ const LOGO = {
 
 const SCREEN_OPTIONS = {
   title: 'FinalStep',
+  headerShown: true,
   headerTransparent: true,
   headerRight: () => <ThemeToggle />,
 };
@@ -31,18 +34,28 @@ export default function Screen() {
       <Stack.Screen options={SCREEN_OPTIONS} />
       <View className="flex-1 items-center justify-center gap-8 p-4">
         <Image source={LOGO[colorScheme ?? 'light']} style={IMAGE_STYLE} resizeMode="contain" />
-        <View className="gap-2 p-4 items-center">
-          <Text className="text-2xl font-bold text-center">
-            Selamat Datang di FinalStep
-          </Text>
-          <Text className="text-muted-foreground text-center">
+        <View className="items-center gap-2 p-4">
+          <Text className="text-center text-2xl font-bold">Selamat Datang di FinalStep</Text>
+          <Text className="text-center text-muted-foreground">
             Platform persiapan ujian terbaik untuk kamu.
           </Text>
         </View>
-        <View className="flex-row gap-4">
+        <View className="w-full gap-4 px-2">
+          <Input
+            icon={<Icon as={MailIcon} className="size-5 text-muted-foreground/40" />}
+            placeholder="ahmad@email.com"
+          />
+          <PasswordInput placeholder="Password" />
+        </View>
+        <View className="w-full flex-row gap-4 px-2">
           <Link href="/auth/login" asChild>
-            <Button className="flex-1">
-              <Text>Mulai Belajar</Text>
+            <Button size="lg" className="flex-1">
+              <Text>MASUK</Text>
+            </Button>
+          </Link>
+          <Link href="/auth/register" asChild>
+            <Button variant="secondary" size="lg" className="flex-1">
+              <Text>DAFTAR</Text>
             </Button>
           </Link>
         </View>
