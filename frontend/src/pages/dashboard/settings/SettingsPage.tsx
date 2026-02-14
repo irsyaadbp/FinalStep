@@ -10,31 +10,82 @@ import { cn } from '../../../lib/utils';
 import { format, parseISO } from 'date-fns';
 import { id as localeId } from 'date-fns/locale';
 import { useToast } from '../../../hooks/useToast';
-import { settings as initialSettings } from '../data';
+import { settingsService } from '../../../service/settings';
+import { useAsyncFetch } from '../../../hooks/useAsyncFetch';
 
 const SettingsPage = () => {
   const { toast } = useToast();
 
-  const [examDate, setExamDate] = useState(initialSettings.examDate);
-  const [targetThreshold, setTargetThreshold] = useState(initialSettings.targetThreshold);
+  const [examDate, setExamDate] = useState<string>('');
+  const [targetThreshold, setTargetThreshold] = useState<number>(0);
 
-  const [localExamDate, setLocalExamDate] = useState<Date>(parseISO(examDate));
-  const [localThreshold, setLocalThreshold] = useState(targetThreshold);
+  const [localExamDate, setLocalExamDate] = useState<Date | undefined>(undefined);
+  const [localThreshold, setLocalThreshold] = useState<number>(0);
   const [calendarOpen, setCalendarOpen] = useState(false);
 
+  // Fetch settings
+  useAsyncFetch(
+    async () => {
+      return await settingsService.getSettings();
+    },
+    {
+      onSuccess: (res) => {
+        const data = res?.data;
+        if (data) {
+          setExamDate(data.examDate);
+          setTargetThreshold(data.targetThreshold);
+          
+          // Initialize local state
+          if (data.examDate) {
+            setLocalExamDate(parseISO(data.examDate));
+          }
+          setLocalThreshold(data.targetThreshold);
+        }
+      },
+    }
+  );
+
+  const { execute: saveSettings, isLoading: isSaving } = useAsyncFetch(
+    async () => {
+      if (!localExamDate) return;
+      const formattedDate = format(localExamDate, 'yyyy-MM-dd');
+      return await settingsService.updateSettings({
+        examDate: formattedDate,
+        targetThreshold: localThreshold,
+      });
+    },
+    {
+      immediate: false,
+      onSuccess: (res) => {
+        const data = res?.data;
+        if (data) {
+          setExamDate(data.examDate);
+          setTargetThreshold(data.targetThreshold);
+          toast({
+            title: 'Pengaturan disimpan',
+            description: 'Konfigurasi berhasil diperbarui.',
+            variant: 'success',
+          });
+        }
+      },
+      onError: () => {
+        toast({
+          title: 'Gagal menyimpan',
+          description: 'Terjadi kesalahan saat menyimpan pengaturan.',
+          variant: 'destructive',
+        });
+      }
+    }
+  );
+
   const handleSave = () => {
-    const formattedDate = format(localExamDate, 'yyyy-MM-dd');
-    setExamDate(formattedDate);
-    setTargetThreshold(localThreshold);
-    toast({
-      title: 'Pengaturan disimpan',
-      description: 'Konfigurasi berhasil diperbarui.',
-      variant: 'success',
-    });
+    saveSettings();
   };
 
-  const hasChanges =
-    format(localExamDate, 'yyyy-MM-dd') !== examDate || localThreshold !== targetThreshold;
+  const hasChanges = localExamDate && (
+    (examDate && format(localExamDate, 'yyyy-MM-dd') !== examDate) || 
+    localThreshold !== targetThreshold
+  );
 
   return (
     <div className="space-y-6">
@@ -128,9 +179,13 @@ const SettingsPage = () => {
       </div>
 
       <div className="flex justify-end">
-        <Button onClick={handleSave} disabled={!hasChanges} className="gap-2">
-          <Save className="h-4 w-4" />
-          Simpan Pengaturan
+        <Button onClick={handleSave} disabled={!hasChanges || isSaving} className="gap-2">
+          {isSaving ? (
+            <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+          ) : (
+            <Save className="h-4 w-4" />
+          )}
+          {isSaving ? 'Menyimpan...' : 'Simpan Pengaturan'}
         </Button>
       </div>
     </div>
