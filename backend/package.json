@@ -4,11 +4,11 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon src/app.ts",
+    "dev": "tsx watch src/app.ts",
     "build": "tsc",
     "start": "node dist/app.js",
-    "seed": "ts-node src/seed.ts",
-    "verify": "ts-node src/verify-api.ts",
+    "seed": "tsx src/seed.ts",
+    "verify": "tsx src/verify-api.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -37,6 +37,7 @@
     "@types/node": "^25.2.3",
     "nodemon": "^3.1.11",
     "ts-node": "^10.9.2",
+    "tsx": "^4.21.0",
     "typescript": "^5.9.3"
   }
 }
