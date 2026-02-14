@@ -1,5 +1,5 @@
 import { useRouter } from 'expo-router';
-import { ScrollText } from 'lucide-react-native';
+import { ScrollText, CheckSquare } from 'lucide-react-native';
 import * as React from 'react';
 import { Dimensions, Text, TouchableOpacity, View } from 'react-native';
 
@@ -54,16 +54,17 @@ export function SubjectCard({
       <Card
         contentClassName={cn(
           'items-center justify-center',
-          isDetailed ? 'p-6' : 'aspect-square p-5'
+          isDetailed ? 'p-6' : 'aspect-square p-5',
+          progress === 100 && 'border-green-200'
         )}>
         <View className={cn('mb-5 items-center justify-center')}>
           <CircularProgress
             size={isDetailed ? 90 : 80}
             strokeWidth={4}
             progress={progress}
-            color="#4F46E5" // primary color
+            color={progress === 100 ? '#22c55e' : '#4F46E5'} // Green-500 if complete
           >
-            <View className="aspect-square items-center justify-center rounded-full p-4">
+            <View className={cn('aspect-square items-center justify-center rounded-full p-4')}>
               <Text className={isDetailed ? 'text-4xl' : 'text-3xl'}>{emoji}</Text>
             </View>
           </CircularProgress>
@@ -80,13 +81,19 @@ export function SubjectCard({
           </View>
         )}
 
-        <Text
-          className={cn(
-            'text-sm font-bold',
-            isDetailed ? 'text-primary' : 'text-xs text-muted-foreground'
-          )}>
-          {progress}%
-        </Text>
+        {progress === 100 ? (
+          <View className="flex-row items-center gap-1">
+            <Text className="text-xs font-bold text-green-600">✅ Selesai</Text>
+          </View>
+        ) : (
+          <Text
+            className={cn(
+              'text-sm font-bold',
+              isDetailed ? 'text-primary' : 'text-xs text-muted-foreground'
+            )}>
+            {progress}%
+          </Text>
+        )}
       </Card>
     </TouchableOpacity>
   );
