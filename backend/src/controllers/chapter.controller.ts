@@ -6,7 +6,47 @@ import { ChapterInput, sanitizeHtml } from '@finalstep/shared';
 export const getChapters = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { subjectSlug } = req.params as { subjectSlug: string };
-    const chapters = await Chapter.find({ subjectSlug, isActive: true }).sort({ order: 1 });
+    
+    const chapters = await Chapter.aggregate([
+      { $match: { subjectSlug, isActive: true } },
+      { $sort: { order: 1 } },
+      {
+        $lookup: {
+          from: 'quizzes',
+          let: { chapterSlug: '$slug', subjectSlug: '$subjectSlug' },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $and: [
+                    { $eq: ['$chapterSlug', '$$chapterSlug'] },
+                    { $eq: ['$subjectSlug', '$$subjectSlug'] },
+                    { $eq: ['$isActive', true] }
+                  ]
+                }
+              }
+            },
+            { $limit: 1 }
+          ],
+          as: 'quiz'
+        }
+      },
+      {
+        $project: {
+          _id: 1,
+          subjectSlug: 1,
+          slug: 1,
+          title: 1,
+          content: 1,
+          order: 1,
+          isActive: 1,
+          createdAt: 1,
+          updatedAt: 1,
+          hasQuiz: { $gt: [{ $size: '$quiz' }, 0] }
+        }
+      }
+    ]);
+
     res.json(success('Chapters retrieved', chapters));
   } catch (err) {
     next(err);

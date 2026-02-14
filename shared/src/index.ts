@@ -64,6 +64,7 @@ export interface Chapter {
   content: string;
   order: number;
   isActive: boolean;
+  hasQuiz?: boolean;
   createdAt?: string;
   updatedAt?: string;
 }

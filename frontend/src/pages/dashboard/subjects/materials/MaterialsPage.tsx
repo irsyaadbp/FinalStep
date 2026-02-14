@@ -6,8 +6,7 @@ import {
   Trash2,
   ChevronLeft,
   ClipboardList,
-  ArrowUp,
-  ArrowDown,
+  ClipboardPlus,
   Trophy,
   X,
 } from "lucide-react";
@@ -23,6 +22,13 @@ import {
   DialogTitle,
   DialogFooter,
 } from "../../../../components/ui/Dialog";
+import { Badge } from "../../../../components/ui/Badge";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "../../../../components/ui/Tooltip";
 import { useToast } from "../../../../hooks/useToast";
 import { cn } from "../../../../lib/utils";
 import { useForm, useFieldArray } from "react-hook-form";
@@ -65,7 +71,7 @@ export default function MaterialsPage() {
       onSuccess: (res) => {
         if (res.data) setSubject(res.data);
       },
-    }
+    },
   );
 
   // Fetch chapters
@@ -76,7 +82,7 @@ export default function MaterialsPage() {
       onSuccess: (res) => {
         if (res.data) setChapters(res.data);
       },
-    }
+    },
   );
 
   // Fetch final exam
@@ -88,7 +94,7 @@ export default function MaterialsPage() {
         if (res.data) setFinalExam(res.data);
       },
       onError: () => setFinalExam(null),
-    }
+    },
   );
 
   useEffect(() => {
@@ -244,7 +250,7 @@ export default function MaterialsPage() {
                 correctAnswer: 0,
               })
             }
-            className="w-full border-dashed"
+            className="w-full"
           >
             <Plus className="mr-1 h-3.5 w-3.5" /> Tambah Soal
           </Button>
@@ -312,23 +318,6 @@ export default function MaterialsPage() {
     }
   };
 
-  const handleReorder = async (fromIdx: number, toIdx: number) => {
-    // This is a simplified reorder logic, ideally backend handles list update
-    // For now we'll just update the order of the two items
-    try {
-        const updatedChapters = [...chapters];
-        const [moved] = updatedChapters.splice(fromIdx, 1);
-        updatedChapters.splice(toIdx, 0, moved);
-        
-        // Update both on backend if needed, or just refresh
-        // Simplified: we'll just show the move and re-fetch
-        // Real implementation would batch update orders
-        toast({ title: "Urutan diperbarui (Simulasi)", variant: 'success' });
-        setChapters(updatedChapters);
-    } catch (err) {
-        console.error(err);
-    }
-  };
 
   // Final exam handlers
   const openExamDialog = () => {
@@ -378,7 +367,8 @@ export default function MaterialsPage() {
   };
 
   return (
-    <div className="space-y-6">
+    <TooltipProvider>
+      <div className="space-y-6">
       <div>
         <Link
           to="/dashboard/subjects"
@@ -405,46 +395,39 @@ export default function MaterialsPage() {
       </div>
 
       <div className="space-y-3">
-        {chapters.map((ch, i) => {
+        {chapters.map((ch) => {
           return (
             <Card key={ch._id} className="shadow-card">
               <CardContent className="flex items-center gap-3 p-4">
-                <div className="flex flex-col gap-0.5 shrink-0">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-6 w-6"
-                    disabled={i === 0}
-                    onClick={() => handleReorder(i, i - 1)}
-                  >
-                    <ArrowUp className="h-3.5 w-3.5" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-6 w-6"
-                    disabled={i === chapters.length - 1}
-                    onClick={() => handleReorder(i, i + 1)}
-                  >
-                    <ArrowDown className="h-3.5 w-3.5" />
-                  </Button>
-                </div>
                 <div className="flex-1 min-w-0">
-                  <p className="font-medium truncate">{ch.title}</p>
-                  <div className="flex items-center gap-2 mt-0.5">
-                      <span className="text-xs text-muted-foreground">
-                          Order: {ch.order}
-                      </span>
+                  <div className="flex items-center gap-2">
+                    <p className="font-medium truncate">{ch.title}</p>
+                    {ch.hasQuiz && (
+                      <Badge variant="secondary" className="bg-emerald-100 text-emerald-700 hover:bg-emerald-100 border-none h-5 px-1.5 text-[10px] font-bold">
+                        QUIZ
+                      </Badge>
+                    )}
                   </div>
                 </div>
                 <div className="flex items-center gap-1 shrink-0">
-                  <Link
-                    to={`/dashboard/subjects/${slug}/materials/${ch.slug}/quizzes`}
-                  >
-                    <Button variant="ghost" size="icon" className="h-8 w-8">
-                      <ClipboardList className="h-3.5 w-3.5" />
-                    </Button>
-                  </Link>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Link
+                        to={`/dashboard/subjects/${slug}/materials/${ch.slug}/quizzes`}
+                      >
+                        <Button variant="ghost" size="icon" className="h-8 w-8">
+                          {ch.hasQuiz ? (
+                            <ClipboardList className="h-3.5 w-3.5" />
+                          ) : (
+                            <ClipboardPlus className="h-3.5 w-3.5" />
+                          )}
+                        </Button>
+                      </Link>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>{ch.hasQuiz ? "Edit Quiz" : "Tambah Quiz"}</p>
+                    </TooltipContent>
+                  </Tooltip>
                   <Button
                     variant="ghost"
                     size="icon"
@@ -537,11 +520,15 @@ export default function MaterialsPage() {
             <Button variant="outline" onClick={() => setDialogOpen(false)}>
               Batal
             </Button>
-            <Button 
-                onClick={handleSubmitChapter(handleSaveChapter)}
-                disabled={isSubmittingChapter}
+            <Button
+              onClick={handleSubmitChapter(handleSaveChapter)}
+              disabled={isSubmittingChapter}
             >
-              {isSubmittingChapter ? "Menyimpan..." : (editing ? "Simpan" : "Tambah")}
+              {isSubmittingChapter
+                ? "Menyimpan..."
+                : editing
+                  ? "Simpan"
+                  : "Tambah"}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -590,11 +577,15 @@ export default function MaterialsPage() {
             <Button variant="outline" onClick={() => setExamDialogOpen(false)}>
               Batal
             </Button>
-            <Button 
-                onClick={handleSubmitExam(handleSaveExam)}
-                disabled={isSubmittingExam}
+            <Button
+              onClick={handleSubmitExam(handleSaveExam)}
+              disabled={isSubmittingExam}
             >
-              {isSubmittingExam ? "Menyimpan..." : (finalExam ? "Simpan" : "Tambah")}
+              {isSubmittingExam
+                ? "Menyimpan..."
+                : finalExam
+                  ? "Simpan"
+                  : "Tambah"}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -623,6 +614,6 @@ export default function MaterialsPage() {
         </DialogContent>
       </Dialog>
     </div>
+    </TooltipProvider>
   );
 }
-
