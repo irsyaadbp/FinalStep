@@ -3,6 +3,7 @@ import mongoose, { Document, Schema } from 'mongoose';
 // Embedded document for last study activity
 const LastStudySchema = new Schema({
   subjectSlug: { type: String, required: true },
+  materialId: { type: String }, // Unified ID/slug for navigation
   chapterSlug: { type: String }, // Nullable if type is not chapter
   quizId: { type: Schema.Types.ObjectId, ref: 'Quiz' }, // Nullable
   type: {
@@ -39,6 +40,7 @@ export interface IUser extends Document {
   lastActiveDate?: Date;
   lastStudy?: {
     subjectSlug: string;
+    materialId?: string;
     chapterSlug?: string;
     quizId?: mongoose.Types.ObjectId;
     type: 'chapter' | 'quiz' | 'final_exam';

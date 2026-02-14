@@ -71,7 +71,8 @@ export interface Chapter {
 
 // Final Exams / Quizzes
 export interface QuizQuestion {
-  id: string;
+  _id?: string;
+  id?: string;
   question: string;
   options: string[];
   correctAnswer: number;
@@ -116,6 +117,7 @@ export interface FinalExam {
   _id: string;
   subjectSlug: string;
   title: string;
+  duration: number; // in minutes
   questions: QuizQuestion[];
   isActive: boolean;
   createdAt?: string;
@@ -153,8 +155,9 @@ export interface UserData {
   }>;
   lastStudy?: {
     subjectSlug: string;
-    chapterSlug: string;
-    type: 'chapter' | 'quiz' | 'exam';
+    chapterSlug?: string;
+    materialId?: string;
+    type: 'chapter' | 'quiz' | 'final_exam';
     title: string;
     updatedAt: string;
     _id: string;

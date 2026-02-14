@@ -75,6 +75,7 @@ export const completeChapter = async (
     // Update Last Study
     user.lastStudy = {
       subjectSlug,
+      materialId: chapterSlug,
       chapterSlug,
       type: "chapter",
       title: chapter.title,
@@ -111,7 +112,7 @@ export const completeQuiz = async (
     // Update Last Study
     user.lastStudy = {
       subjectSlug,
-      quizId: quiz._id,
+      materialId: quiz._id.toString(),
       type: "quiz",
       title: quiz.title,
       updatedAt: new Date(),
@@ -147,6 +148,7 @@ export const completeFinalExam = async (
 
     user.lastStudy = {
       subjectSlug,
+      materialId: exam._id.toString(),
       type: "final_exam",
       title: exam.title,
       updatedAt: new Date(),

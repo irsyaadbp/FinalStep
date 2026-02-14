@@ -1,3 +1,10 @@
+import { motion } from "motion/react";
+import { useState } from "react";
+import { Card, CardContent } from "../../components/ui/Card";
+import { Button } from "../../components/ui/Button";
+import { SubjectCard } from "../../components/app/SubjectCard";
+
+import { useNavigate } from "react-router";
 import {
   AlertTriangle,
   ArrowRight,
@@ -7,34 +14,58 @@ import {
   Target,
   Zap,
 } from "lucide-react";
-import { motion } from "motion/react";
-import { Card, CardContent } from "../../components/ui/Card";
-import { Button } from "../../components/ui/Button";
-import { SubjectCard } from "../../components/app/SubjectCard";
+import { useAuth } from "@/context/AuthContext";
+import { subjectService } from "@/service/subject";
+import { useAsyncFetch } from "@/hooks/useAsyncFetch";
+import { type Subject } from "@finalstep/shared";
 
 export default function IndexPage() {
-  const name = "Irsyaad";
-  const streak = 5;
-  const dailyXP = 75;
-  const dailyGoal = 100;
-  const isAhead = false;
-  const isOnTrack = true;
-  const overallProgress = 45;
-  const daysLeft = 12;
-  const completedChapters = 4;
-  const totalChapters = 10;
-  const timeProgress = 30;
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const [subjects, setSubjects] = useState<(Subject & { progress: number })[]>([]);
 
-  const subjects = [
-    { id: 'math', slug: 'math', title: "Matematika", progress: 75, icon: "📐" },
-    { id: 'physics', slug: 'physics', title: "Fisika", progress: 45, icon: "⚡" },
-    { id: 'chemistry', slug: 'chemistry', title: "Kimia", progress: 30, icon: "🧪" },
-    { id: 'biology', slug: 'biology', title: "Biologi", progress: 90, icon: "🧬" },
-    { id: 'indonesian', slug: 'indonesian', title: "Bahasa Indonesia", progress: 100, icon: "🇮🇩" },
-    { id: 'english', slug: 'english', title: "Bahasa Inggris", progress: 60, icon: "🇬🇧" },
-    { id: 'history', slug: 'history', title: "Sejarah", progress: 20, icon: "📜" },
-    { id: 'geography', slug: 'geography', title: "Geografi", progress: 10, icon: "🌍" },
-  ];
+  useAsyncFetch(
+    async () => {
+      return await subjectService.getSubjects();
+    },
+    {
+      onSuccess: (res) => {
+        if (res.data && user) {
+          // Map backend subjects with user progress
+          const subjectsWithProgress = res.data.map((s) => {
+            const userProgress = user.progress?.find(
+              (p) => p.subjectSlug === s.slug
+            );
+            return {
+              ...s,
+              id: s._id,
+              progress: userProgress?.progressPercent || 0,
+            };
+          });
+          setSubjects(subjectsWithProgress);
+        }
+      },
+    }
+  );
+
+  const name = user?.name.split(" ")[0] || "Student";
+  const streak = user?.streak || 0;
+  const dailyXP = user?.dailyXP || 0;
+  const dailyGoal = user?.dailyGoal || 100;
+  const isAhead = dailyXP > dailyGoal;
+  const isOnTrack = dailyXP > 0;
+  
+  // Calculate aggregate progress
+  const totalChapters = subjects.reduce((acc: number, s) => acc + (s.totalChapters || 0), 0);
+  const completedChapters = user?.progress?.reduce((acc: number, p) => acc + (p.completedChapters?.length || 0), 0) || 0;
+  const overallProgress = totalChapters > 0 ? Math.round((completedChapters / totalChapters) * 100) : 0;
+
+  const lastStudy = user?.lastStudy;
+  
+  const daysLeft = 12; // This could be dynamic if we have a target date
+  const timeProgress = 30; // Dummy for now, or based on time since start
+
+
 
   return (
     <div className="space-y-6">
@@ -191,7 +222,17 @@ export default function IndexPage() {
 
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 pb-2">
           {subjects.map((s, i) => (
-            <SubjectCard key={s.id} subject={s} index={i} />
+            <SubjectCard 
+              key={s._id} 
+              subject={{
+                id: s._id,
+                slug: s.slug,
+                title: s.title,
+                progress: s.progress,
+                icon: s.icon
+              }} 
+              index={i} 
+            />
           ))}
         </div>
       </motion.div>
@@ -200,19 +241,42 @@ export default function IndexPage() {
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.5 }}
-        className="sticky bottom-[calc(67px+2rem)] right-0 left-0"
+        className="sticky bottom-24.75 right-0 left-0"
       >
-        <Button className="h-[unset]! w-full px-4 py-3">
+        <Button 
+          className="h-[unset]! w-full px-4 py-3"
+          onClick={() => {
+            if (!lastStudy) {
+              navigate(`/subjects`);
+            } else {
+              const subjectProgress = user?.progress?.find(p => p.subjectSlug === lastStudy.subjectSlug);
+              const isExamDone = lastStudy.type === 'final_exam' && subjectProgress?.finalExamDone;
+
+              if (isExamDone) {
+                navigate(`/subjects`);
+              } else {
+                const mid = lastStudy.materialId || lastStudy.chapterSlug;
+                if (mid) {
+                  navigate(`/subjects/${lastStudy.subjectSlug}/material/${mid}`);
+                } else {
+                  navigate(`/subjects/${lastStudy.subjectSlug}`);
+                }
+              }
+            }
+          }}
+        >
           <div className="flex items-center gap-5 w-full">
             <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary-foreground/15 text-2xl shrink-0">
-              {"📚"}
+              {lastStudy ? "📚" : "✨"}
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-sm font-bold font-display text-start">
-                Lanjutkan Belajar
+                {lastStudy ? "Lanjutkan Belajar" : "Mulai Belajar"}
               </p>
               <p className="text-xs opacity-80 mt-0.5 line-clamp-1 text-start">
-                {"Pertemuan 1"} — {"100%"} selesai
+                {lastStudy 
+                    ? `${lastStudy.title}` 
+                    : "Pilih pelajaran pertamamu!"}
               </p>
             </div>
             <ArrowRight className="h-5 w-5 opacity-70 shrink-0" />

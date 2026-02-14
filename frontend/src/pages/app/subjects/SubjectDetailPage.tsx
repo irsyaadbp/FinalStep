@@ -9,37 +9,86 @@ import {
   Trophy,
   BookOpen,
   ClipboardList,
+  ArrowRight,
 } from "lucide-react";
 import { Card } from "../../../components/ui/Card";
-import { subjects, allChapters, quizzes, finalExams } from "./data";
 import { Button } from "../../../components/ui/Button";
+import { useAuth } from "@/context/AuthContext";
+import { subjectService } from "@/service/subject";
+import { chapterService } from "@/service/chapter";
+import { finalExamService } from "@/service/finalExam";
+import { useAsyncFetch } from "@/hooks/useAsyncFetch";
+import { type Subject, type Chapter, type FinalExam } from "@finalstep/shared";
 
 export default function SubjectDetailPage() {
   const { slug } = useParams();
   const navigate = useNavigate();
+  const { user } = useAuth();
 
-  const subject = subjects.find((s) => s.slug === slug);
-  const subjectId = subject?.id;
+  const [subject, setSubject] = useState<(Subject & { progress?: number }) | null>(null);
+  const [chapters, setChapters] = useState<Chapter[]>([]);
+  const [finalExam, setFinalExam] = useState<FinalExam | null>(null);
 
-  // Local state for tracking completion (reset on reload obviously)
-  const [localCompletedChapters] = useState<string[]>(
-    allChapters.filter((c) => c.completed).map((c) => c.id),
+  useAsyncFetch(
+    async () => {
+      if (!slug) return null;
+      return await subjectService.getSubjects();
+    },
+    {
+      onSuccess: (res) => {
+        if (res && 'data' in res && res.data) {
+          const found = res.data.find(s => s.slug === slug);
+          if (found) {
+            const userProgress = user?.progress?.find(p => p.subjectSlug === slug);
+            setSubject({ ...found, progress: userProgress?.progressPercent || 0 });
+          }
+        }
+      },
+    }
   );
-  // We need localPassedExams to know if the exam is passed, to show the checkmark/status
-  const [localPassedExams] = useState<string[]>([]);
 
-  const chapters = allChapters
-    .filter((c) => c.subjectId === subjectId)
-    .sort((a, b) => a.order - b.order)
-    .map((c) => ({
+  useAsyncFetch(
+    async () => {
+      if (!slug) return [];
+      return await chapterService.getChapters(slug);
+    },
+    {
+      onSuccess: (res) => {
+        if (res && 'data' in res && res.data) {
+          setChapters(res.data);
+        }
+      },
+    }
+  );
+
+  useAsyncFetch(
+    async () => {
+      if (!slug) return null;
+      return await finalExamService.getFinalExam(slug);
+    },
+    {
+      onSuccess: (res) => {
+        if (res && 'data' in res && res.data) {
+          setFinalExam(res.data);
+        }
+      },
+    }
+  );
+
+  const subjectProgress = user?.progress?.find(p => p.subjectSlug === slug);
+  const completedChapters = subjectProgress?.completedChapters || [];
+  const isFinalExamPassed = subjectProgress?.finalExamDone || false;
+
+  const chaptersWithStatus = chapters.map((c, i) => {
+    const isCompleted = completedChapters.includes(c.slug);
+    const isUnlocked = i === 0 || completedChapters.includes(chapters[i-1].slug);
+    return {
       ...c,
-      completed: localCompletedChapters.includes(c.id),
-    }));
-
-  const finalExam = finalExams.find((fe) => fe.subjectId === subjectId);
-  if (finalExam) {
-    finalExam.passed = !!subjectId && localPassedExams.includes(subjectId);
-  }
+      id: c._id,
+      completed: isCompleted,
+      unlocked: isUnlocked
+    };
+  });
 
   if (!subject) {
     return (
@@ -49,30 +98,21 @@ export default function SubjectDetailPage() {
     );
   }
 
-  const completedCount = chapters.filter((c) => c.completed).length;
-  const allChaptersCompleted = completedCount === chapters.length;
+  const completedCount = chaptersWithStatus.filter((c) => c.completed).length;
+  const allChaptersCompleted = chapters.length > 0 && completedCount === chapters.length;
   const isFinalExamUnlocked = allChaptersCompleted;
-  const isFinalExamPassed = finalExam?.passed ?? false;
 
   const openChapter = (index: number) => {
-    const ch = chapters[index];
+    const ch = chaptersWithStatus[index];
     if (!ch) return;
-    const isUnlocked = index === 0 || chapters[index - 1]?.completed;
-    if (!isUnlocked) return;
+    if (!ch.unlocked) return;
 
-    navigate(`/subjects/${slug}/material/${ch.id}`);
+    navigate(`/subjects/${slug}/material/${ch.slug}`);
   };
 
   const openFinalExam = () => {
     if (!isFinalExamUnlocked || !finalExam) return;
-    navigate(`/subjects/${slug}/material/${finalExam.id}`);
-  };
-
-  const getChapterStatus = (index: number) => {
-    const ch = chapters[index];
-    if (ch.completed) return "completed";
-    if (index === 0 || chapters[index - 1]?.completed) return "unlocked";
-    return "locked";
+    navigate(`/subjects/${slug}/material/${finalExam._id}`);
   };
 
   return (
@@ -108,7 +148,7 @@ export default function SubjectDetailPage() {
                   Progres Belajar
                 </p>
                 <p className="text-2xl font-black font-display mt-0.5">
-                  {subject.progress}%
+                  {subjectProgress?.progressPercent || 0}%
                 </p>
               </div>
               <div className="flex items-center gap-1.5 rounded-full bg-secondary px-3 py-1.5">
@@ -121,7 +161,7 @@ export default function SubjectDetailPage() {
             <div className="h-2.5 w-full overflow-hidden rounded-full bg-secondary">
               <motion.div
                 initial={{ width: 0 }}
-                animate={{ width: `${subject.progress}%` }}
+                animate={{ width: `${subjectProgress?.progressPercent || 0}%` }}
                 transition={{ duration: 0.8, ease: "easeOut" }}
                 className="h-full rounded-full bg-primary shadow-[inset_0_1px_0_0_rgba(255,255,255,0.4)]"
               />
@@ -139,9 +179,8 @@ export default function SubjectDetailPage() {
         </div>
 
         <div className="space-y-2 flex-1">
-          {chapters.map((ch, i) => {
-            const status = getChapterStatus(i);
-            const hasQuiz = quizzes.some((q) => q.chapterId === ch.id);
+          {chaptersWithStatus.map((ch, i) => {
+            const status = ch.completed ? "completed" : ch.unlocked ? "unlocked" : "locked";
 
             return (
               <motion.button
@@ -180,7 +219,7 @@ export default function SubjectDetailPage() {
                     <span className="text-[10px] text-muted-foreground">
                       Bab {i + 1}
                     </span>
-                    {hasQuiz && (
+                    {ch.hasQuiz && (
                       <>
                         <span className="text-[10px] text-muted-foreground">
                           •
@@ -295,12 +334,25 @@ export default function SubjectDetailPage() {
         <Button
           className=" w-full px-4 py-3 flex gap-4 justify-between"
           onClick={() => {
-            const firstIncomplete = chapters.findIndex((c) => !c.completed);
-            openChapter(firstIncomplete === -1 ? 0 : firstIncomplete);
+            if (subject.progress === 100 && isFinalExamPassed) {
+              navigate('/subjects');
+            } else {
+              const firstIncomplete = chaptersWithStatus.findIndex((c) => !c.completed);
+              openChapter(firstIncomplete === -1 ? 0 : firstIncomplete);
+            }
           }}
         >
-          {completedCount === 0 ? "Mulai Belajar" : "Lanjut Belajar"}
-          <Play className="h-4 w-4 fill-current" />
+          {subject.progress === 100 && isFinalExamPassed ? (
+            <>
+              Pilih Mata Pelajaran Lain
+              <ArrowRight className="h-4 w-4" />
+            </>
+          ) : (
+            <>
+              {completedCount === 0 ? "Mulai Belajar" : "Lanjut Belajar"}
+              <Play className="h-4 w-4 fill-current" />
+            </>
+          )}
         </Button>
       </motion.div>
     </div>

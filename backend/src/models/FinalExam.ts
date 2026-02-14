@@ -1,6 +1,7 @@
 import mongoose, { Document, Schema } from 'mongoose';
 
 const QuestionSchema = new Schema({
+  id: { type: String },
   question: { type: String, required: true },
   options: {
     type: [String],
