@@ -82,7 +82,19 @@ To preview the mobile app, you can scan the QR code below using the **Expo Go** 
 
 ![Expo QR Code Placeholder](/expo-qr.png)
 
-### 6. Tech Stack
+### 6. Testing Accounts
+
+You can use these accounts to test the application's functionality:
+
+**Admin (Dashboard):**
+- **Email:** `admin@finalstep.com`
+- **Password:** `password123`
+
+**Students:**
+- **Email:** `budi@student.com`, `andi@student.com`, `citra@student.com`
+- **Password:** `password123`
+
+### 7. Tech Stack
 
 - **Backend**: Express, TypeScript, Mongoose, Zod, JWT
 - **Frontend**: React, Vite, Tailwind CSS, Lucide React, Framer Motion
@@ -166,7 +178,19 @@ Untuk melihat pratinjau aplikasi mobile, Anda dapat memindai kode QR di bawah in
 
 ![Expo QR Code Placeholder](/expo-qr.png)
 
-### 6. Tech Stack
+### 6. Akun Testing
+
+Anda dapat menggunakan akun-akun berikut untuk menguji fungsionalitas aplikasi:
+
+**Admin (Dashboard):**
+- **Email:** `admin@finalstep.com`
+- **Password:** `password123`
+
+**Siswa:**
+- **Email:** `budi@student.com`, `andi@student.com`, `citra@student.com`
+- **Password:** `password123`
+
+### 7. Tech Stack
 
 - **Backend**: Express, TypeScript, Mongoose, Zod, JWT
 - **Frontend**: React, Vite, Tailwind CSS, Lucide React, Framer Motion
