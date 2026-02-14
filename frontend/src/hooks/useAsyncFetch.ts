@@ -15,6 +15,9 @@ export function useAsyncFetch<T>(asyncFn: () => Promise<T>, options: UseAsyncFet
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<unknown>(null);
 
+  const asyncFnRef = useRef(asyncFn);
+  asyncFnRef.current = asyncFn;
+
   const optionsRef = useRef(options);
   optionsRef.current = options;
 
@@ -22,7 +25,7 @@ export function useAsyncFetch<T>(asyncFn: () => Promise<T>, options: UseAsyncFet
     setIsLoading(true);
     setError(null);
     try {
-      const result = await asyncFn();
+      const result = await asyncFnRef.current();
       setData(result);
       if (optionsRef.current.onSuccess) optionsRef.current.onSuccess(result);
     } catch (err: unknown) {
@@ -31,7 +34,7 @@ export function useAsyncFetch<T>(asyncFn: () => Promise<T>, options: UseAsyncFet
     } finally {
       setIsLoading(false);
     }
-  }, [asyncFn]);
+  }, []);
 
   useEffect(() => {
     if (immediate) {

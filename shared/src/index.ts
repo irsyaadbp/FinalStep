@@ -32,6 +32,22 @@ export const subjectSchema = z.object({
 
 export type SubjectInput = z.infer<typeof subjectSchema>;
 
+export interface Subject {
+  _id: string; // Mongoose ID
+  slug: string;
+  title: string;
+  icon: string;
+  color: string;
+  order: number;
+  isActive: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+  // Optional counts for frontend display if aggregated
+  totalChapters?: number;
+  totalQuizzes?: number;
+  completedChapters?: number;
+}
+
 // Chapters / Materials
 export const chapterSchema = z.object({
   title: z.string().min(1, 'Judul materi harus diisi'),
@@ -40,7 +56,26 @@ export const chapterSchema = z.object({
 
 export type ChapterInput = z.infer<typeof chapterSchema>;
 
+export interface Chapter {
+  _id: string;
+  subjectSlug: string;
+  slug: string;
+  title: string;
+  content: string;
+  order: number;
+  isActive: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
 // Final Exams / Quizzes
+export interface QuizQuestion {
+  id: string;
+  question: string;
+  options: string[];
+  correctAnswer: number;
+}
+
 export const quizSchema = z.object({
   title: z.string().min(1, 'Judul quiz harus diisi'),
   questions: z.array(z.object({
@@ -53,6 +88,17 @@ export const quizSchema = z.object({
 
 export type QuizInput = z.infer<typeof quizSchema>;
 
+export interface Quiz {
+  _id: string;
+  chapterSlug: string;
+  subjectSlug: string;
+  title: string;
+  questions: QuizQuestion[];
+  isActive: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
 export const finalExamSchema = z.object({
   title: z.string().min(1, 'Judul ujian harus diisi'),
   questions: z.array(z.object({
@@ -62,6 +108,18 @@ export const finalExamSchema = z.object({
     correctAnswer: z.number().min(0).max(3),
   })).min(1, 'Minimal 1 pertanyaan'),
 });
+
+export type FinalExamInput = z.infer<typeof finalExamSchema>;
+
+export interface FinalExam {
+  _id: string;
+  subjectSlug: string;
+  title: string;
+  questions: QuizQuestion[];
+  isActive: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+}
 
 export interface ApiResponse<T = any> {
   success: boolean;
@@ -112,4 +170,4 @@ export interface AuthData {
 
 export type AuthResponse = ApiResponse<AuthData>;
 
-export type FinalExamInput = z.infer<typeof finalExamSchema>;
+

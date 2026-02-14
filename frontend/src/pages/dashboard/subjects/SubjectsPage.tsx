@@ -1,42 +1,69 @@
 import { Link } from "react-router";
 import { Card, CardContent } from "../../../components/ui/Card";
 import { Button } from "../../../components/ui/Button";
-import { BookOpen, ClipboardList, FileTextIcon, PencilIcon, Trash2Icon, Plus } from "lucide-react";
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "../../../components/ui/Dialog";
+import {
+  BookOpen,
+  ClipboardList,
+  FileTextIcon,
+  PencilIcon,
+  Trash2Icon,
+  Plus,
+} from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "../../../components/ui/Dialog";
 import { useState } from "react";
-import type { Subject } from "../../../components/app/SubjectCard";
 import { useToast } from "../../../hooks/useToast";
-import { subjects as initialSubjects, allChapters as chapters, quizzes } from "../../app/subjects/data";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { subjectSchema, type SubjectInput as SubjectFormValues } from "@finalstep/shared";
-import { FormGenerator, type FormField } from "../../../components/common/FormGenerator";
+import {
+  subjectSchema,
+  type Subject,
+  type SubjectInput as SubjectFormValues,
+} from "@finalstep/shared";
+import {
+  FormGenerator,
+  type FormField,
+} from "../../../components/common/FormGenerator";
+import { subjectService } from "../../../service/subject";
+import { useAsyncFetch } from "../../../hooks/useAsyncFetch";
 
-const COLORS = ['bg-blue-500', 'bg-amber-500', 'bg-emerald-500', 'bg-pink-500', 'bg-cyan-500', 'bg-red-500', 'bg-purple-500', 'bg-orange-500'];
-const ICONS = ['📐', '⚡', '🧪', '🧬', '📝', '📖', '🎨', '🌍', '💻', '🎵'];
+const COLORS = [
+  "bg-blue-500",
+  "bg-amber-500",
+  "bg-emerald-500",
+  "bg-pink-500",
+  "bg-cyan-500",
+  "bg-red-500",
+  "bg-purple-500",
+  "bg-orange-500",
+];
+const ICONS = ["📐", "⚡", "🧪", "🧬", "📝", "📖", "🎨", "🌍", "💻", "🎵"];
 
 export default function SubjectsPage() {
-  const [subjects, setSubjects] = useState<Subject[]>(
-    initialSubjects as Subject[],
-  );
-
-  const addSubject = (subject: Subject) => {
-    setSubjects((prev) => [...prev, subject]);
-  };
-
-  const updateSubject = (id: string | number, updates: Partial<Subject>) => {
-    setSubjects((prev) =>
-      prev.map((s) => (s.id === id ? { ...s, ...updates } : s)),
-    );
-  };
-
-  const deleteSubject = (id: string | number) => {
-    setSubjects((prev) => prev.filter((s) => s.id !== id));
-  };
-
+  const [subjects, setSubjects] = useState<Subject[]>([]);
   const { toast } = useToast();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editing, setEditing] = useState<Subject | null>(null);
+  const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
+
+  // Fetch subjects
+  const { execute: fetchSubjects } = useAsyncFetch(
+    async () => {
+      return await subjectService.getSubjects();
+    },
+    {
+      onSuccess: (res) => {
+        if (res.data) {
+          setSubjects(res.data);
+        }
+      },
+    }
+  );
 
   const {
     register,
@@ -44,7 +71,7 @@ export default function SubjectsPage() {
     setValue,
     watch,
     reset,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm<SubjectFormValues>({
     resolver: zodResolver(subjectSchema),
     defaultValues: {
@@ -121,41 +148,34 @@ export default function SubjectsPage() {
     setDialogOpen(true);
   };
 
-  const onSubmit = (data: SubjectFormValues) => {
-    if (editing) {
-      updateSubject(editing.id, {
-        title: data.title,
-        icon: data.icon,
-        color: data.color,
-      });
-      toast({ title: "Pelajaran diperbarui", variant: 'success' });
-    } else {
-      const slug = data.title.toLowerCase().replace(/\s+/g, "-");
-      const id = slug + "-" + Math.random().toString(36).substring(2, 9);
-      addSubject({
-        id,
-        slug,
-        title: data.title,
-        icon: data.icon,
-        color: data.color,
-        progress: 0,
-        totalChapters: 0,
-        completedChapters: 0,
-      });
-      toast({ title: "Pelajaran ditambahkan", variant: 'success' });
+  const onSubmit = async (data: SubjectFormValues) => {
+    try {
+      if (editing) {
+        await subjectService.updateSubject(editing.slug, data);
+        toast({ title: "Pelajaran diperbarui", variant: "success" });
+      } else {
+        await subjectService.createSubject(data);
+        toast({ title: "Pelajaran ditambahkan", variant: "success" });
+      }
+      fetchSubjects();
+      setDialogOpen(false);
+    } catch (error) {
+      // Error handling is done by $fetch, but we can catch here if needed
+      console.error(error);
     }
-    setDialogOpen(false);
   };
 
-  const [deleteConfirm, setDeleteConfirm] = useState<string | number | null>(
-    null,
-  );
-
-  const handleDelete = (id: string | number) => {
-    deleteSubject(id);
-    setDeleteConfirm(null);
-    toast({ title: "Pelajaran dihapus", variant: 'success' });
+  const handleDelete = async (slug: string) => {
+    try {
+      await subjectService.deleteSubject(slug);
+      setDeleteConfirm(null);
+      fetchSubjects();
+      toast({ title: "Pelajaran dihapus", variant: "success" });
+    } catch (error) {
+      console.error(error);
+    }
   };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -172,15 +192,18 @@ export default function SubjectsPage() {
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {subjects.map((s) => {
-          const chCount = chapters.filter((c) => c.subjectId === s.id).length;
-          const qCount = quizzes.filter((q) => q.subjectId === s.id).length;
+          const chCount = s.totalChapters || 0;
+          const qCount = s.totalQuizzes || 0;
           return (
-            <Card key={s.id} className="shadow-card">
+            <Card key={s._id} className="shadow-card">
               <CardContent className="p-5">
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex items-center gap-3">
                     <div
-                      className={`flex h-10 w-10 items-center justify-center rounded-xl ${s.color} text-lg`}
+                      className={`flex h-10 w-10 items-center justify-center rounded-xl text-lg`}
+                      style={{
+                        backgroundColor: s.color
+                      }}
                     >
                       {s.icon}
                     </div>
@@ -199,7 +222,7 @@ export default function SubjectsPage() {
                       variant="ghost"
                       size="icon"
                       className="h-8 w-8 text-destructive"
-                      onClick={() => setDeleteConfirm(s.id)}
+                      onClick={() => setDeleteConfirm(s.slug)}
                     >
                       <Trash2Icon className="h-3.5 w-3.5" />
                     </Button>
@@ -249,7 +272,13 @@ export default function SubjectsPage() {
               >
                 Batal
               </Button>
-              <Button type="submit">{editing ? "Simpan" : "Tambah"}</Button>
+              <Button type="submit" disabled={isSubmitting}>
+                {isSubmitting
+                  ? "Menyimpan..."
+                  : editing
+                  ? "Simpan"
+                  : "Tambah"}
+              </Button>
             </DialogFooter>
           </form>
         </DialogContent>

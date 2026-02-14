@@ -3,10 +3,50 @@ import { Subject } from '../models';
 import { success, error } from '../utils/response';
 import { SubjectInput } from '@finalstep/shared';
 
-// Public: List all active subjects
+// Public: List all active subjects with counts
 export const getSubjects = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const subjects = await Subject.find({ isActive: true }).sort({ order: 1 });
+    const subjects = await Subject.aggregate([
+      { $match: { isActive: true } },
+      { $sort: { order: 1 } },
+      {
+        $lookup: {
+          from: 'chapters',
+          localField: 'slug',
+          foreignField: 'subjectSlug',
+          as: 'chapters',
+          pipeline: [
+            { $match: { isActive: true } }
+          ]
+        }
+      },
+      {
+        $lookup: {
+          from: 'quizzes',
+          localField: 'slug',
+          foreignField: 'subjectSlug',
+          as: 'quizzes',
+          pipeline: [
+            { $match: { isActive: true } }
+          ]
+        }
+      },
+      {
+        $project: {
+          _id: 1,
+          slug: 1,
+          title: 1,
+          icon: 1,
+          color: 1,
+          order: 1,
+          isActive: 1,
+          createdAt: 1,
+          updatedAt: 1,
+          totalChapters: { $size: '$chapters' },
+          totalQuizzes: { $size: '$quizzes' }
+        }
+      }
+    ]);
     res.json(success('Subjects retrieved', subjects));
   } catch (err) {
     next(err);
