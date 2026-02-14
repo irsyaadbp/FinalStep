@@ -16,6 +16,7 @@ import {
   Zap,
 } from "lucide-react";
 import { Button } from "../../../components/ui/Button";
+import { useAuth } from "../../../context/AuthContext";
 
 const LEVEL_THRESHOLDS = [
   0, 100, 250, 500, 1000, 2000, 3500, 5500, 8000, 12000,
@@ -31,27 +32,31 @@ function getXPProgress(xp: number, level: number) {
 }
 
 export default function ProfilePage() {
-  const xp = 1000;
-  const level = 5;
-  const name = "Irsyaad";
-  const email = "irsyaad@finalstep.id";
-  const targetUniversity = "Universitas Bina Nusantara";
-  const streak = 5;
-  const completedChapters = 12;
-  const overallProgress = 67;
-
-  const subjects = [
-    { id: 1, title: "Matematika", progress: 75, icon: "📐" },
-    { id: 2, title: "Fisika", progress: 45, icon: "⚡" },
-    { id: 3, title: "Kimia", progress: 30, icon: "🧪" },
-    { id: 4, title: "Biologi", progress: 90, icon: "🧬" },
-  ];
-
+  const { user, logout } = useAuth();
   const navigate = useNavigate();
+
+  const xp = user?.xp || 0;
+  const level = user?.level || 1;
+  const name = user?.name || "Student";
+  const email = user?.email || "";
+  const targetUniversity = user?.targetUniversity || "-";
+  const streak = user?.streak || 0;
+  // TODO: Calculate these from real progress data
+  const completedChapters = 0;
+  const overallProgress = 0;
+
+  const subjects =
+    user?.progress?.map((p, i) => ({
+      id: i,
+      title: p.subjectSlug, // We might need a map for slug -> title
+      progress: p.progressPercent,
+      icon: "📚",
+    })) || [];
 
   const { progress: levelProgress, nextThreshold } = getXPProgress(xp, level);
 
   const handleLogout = () => {
+    logout();
     navigate("/login");
   };
 
@@ -103,9 +108,7 @@ export default function ProfilePage() {
                 </span>
                 <div className="flex items-center gap-1">
                   <Zap className="h-3 w-3 text-xp" />
-                  <span className="text-xs font-bold text-xp">
-                    {xp} XP
-                  </span>
+                  <span className="text-xs font-bold text-xp">{xp} XP</span>
                 </div>
               </div>
               <div className="h-2.5 w-full overflow-hidden rounded-full bg-secondary">
@@ -191,7 +194,7 @@ export default function ProfilePage() {
               <button
                 key={item.label}
                 onClick={() => navigate(item.to)}
-                className="flex w-full items-center gap-3 px-4 py-3.5 text-left hover:bg-secondary/50 transition-colors"
+                className="flex w-full items-center gap-3 px-4 py-3.5 text-left hover:bg-secondary/50 cursor-pointer transition-colors"
               >
                 <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-secondary shrink-0">
                   <item.icon className="h-4 w-4 text-muted-foreground" />
@@ -213,11 +216,7 @@ export default function ProfilePage() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2 }}
       >
-        <Button
-          variant="destructive"
-          className="w-full"
-          onClick={handleLogout}
-        >
+        <Button variant="destructive" className="w-full" onClick={handleLogout}>
           <LogOut className="mr-2 h-4 w-4" />
           Keluar dari Akun
         </Button>

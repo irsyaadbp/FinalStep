@@ -63,4 +63,53 @@ export const finalExamSchema = z.object({
   })).min(1, 'Minimal 1 pertanyaan'),
 });
 
+export interface ApiResponse<T = any> {
+  success: boolean;
+  message: string;
+  data?: T;
+  errors?: { [k: string]: string[] };
+}
+
+export interface UserData {
+  _id: string;
+  name: string;
+  email: string;
+  role: 'student' | 'admin';
+  school?: string;
+  targetUniversity?: string;
+  avatar?: string;
+  xp: number;
+  level: number;
+  streak: number;
+  dailyXP: number;
+  dailyGoal: number;
+  progress: Array<{
+    subjectSlug: string;
+    progressPercent: number;
+    completedChapters: string[];
+    completedQuizzes: string[];
+    finalExamDone: boolean;
+    lastAccessedAt: string;
+    _id: string;
+  }>;
+  lastStudy?: {
+    subjectSlug: string;
+    chapterSlug: string;
+    type: 'chapter' | 'quiz' | 'exam';
+    title: string;
+    updatedAt: string;
+    _id: string;
+  };
+  lastActiveDate?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface AuthData {
+  user: UserData;
+  token: string;
+}
+
+export type AuthResponse = ApiResponse<AuthData>;
+
 export type FinalExamInput = z.infer<typeof finalExamSchema>;

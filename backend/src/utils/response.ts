@@ -1,9 +1,4 @@
-export interface ApiResponse<T = any> {
-  success: boolean;
-  message: string;
-  data?: T;
-  errors?: { [k: string]: string[] };
-}
+import { ApiResponse } from '@finalstep/shared';
 
 export const success = <T>(message: string, data?: T): ApiResponse<T> => {
   return {

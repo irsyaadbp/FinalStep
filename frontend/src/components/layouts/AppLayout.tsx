@@ -2,6 +2,7 @@ import { Link, Outlet, useLocation, useNavigate } from "react-router";
 import { Home, BookOpen, User, GraduationCap, LogOut } from "lucide-react";
 import { Avatar, AvatarFallback } from "../ui/Avatar";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/Tooltip";
+import { useAuth } from "../../context/AuthContext";
 
 const studentDesktopLinks = [
   { to: "/", icon: Home, label: "Beranda" },
@@ -16,13 +17,14 @@ const studentMobileLinks = [
 ];
 
 export default function AppLayout() {
+  const { user, logout } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
 
-  const name = "Irsyaad"
+  const name = user?.name || "Student";
 
   const handleLogout = () => {
-    // logout();
+    logout();
     navigate("/login");
   };
 

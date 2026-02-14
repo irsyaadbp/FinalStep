@@ -2,6 +2,7 @@ import { BookOpen, GraduationCap, LayoutDashboard, LogOutIcon, Settings, Users }
 import { Outlet, Link, useLocation, useNavigate } from "react-router";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/Tooltip";
 import { Avatar, AvatarFallback } from "../ui/Avatar";
+import { useAuth } from "../../context/AuthContext";
 
 const adminDesktopLinks = [
   { to: "/dashboard", icon: LayoutDashboard, label: "Dashboard", exact: true },
@@ -11,11 +12,13 @@ const adminDesktopLinks = [
 ];
 
 export default function DashboardLayout() {
-  const location = useLocation();
+  const { user, logout } = useAuth();
   const navigate = useNavigate();
-  const name = "Irsyaad";
+  const location = useLocation();
+  const name = user?.name || "Admin";
 
   const handleLogout = () => {
+    logout();
     navigate("/login");
   };
 

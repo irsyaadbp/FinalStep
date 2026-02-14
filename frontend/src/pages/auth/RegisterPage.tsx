@@ -1,4 +1,4 @@
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { motion } from "motion/react";
 import {
   GraduationCap,
@@ -8,12 +8,16 @@ import {
   User,
   Lock,
 } from "lucide-react";
-import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { registerSchema, type RegisterInput } from "@finalstep/shared";
+import { registerSchema, type RegisterInput, TOKEN_KEY } from "@finalstep/shared";
 import { FormGenerator, type FormField } from "../../components/common/FormGenerator";
 import { Button } from "../../components/ui/Button";
+import { useAsyncFetch } from "../../hooks/useAsyncFetch";
+import { authService } from "../../service/auth";
+import { type AuthResponse } from "@finalstep/shared";
+import { toast } from "sonner";
+import { useAuth } from "../../context/AuthContext";
 
 const fields: FormField<RegisterInput>[] = [
   {
@@ -59,11 +63,12 @@ const fields: FormField<RegisterInput>[] = [
 ];
 
 export default function RegisterPage() {
-  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const {
     register,
     handleSubmit,
+    getValues,
     formState: { errors },
   } = useForm({
     resolver: zodResolver(registerSchema),
@@ -76,14 +81,35 @@ export default function RegisterPage() {
     },
   });
 
-  const onSubmit = async (data: RegisterInput) => {
-    setLoading(true);
-    try {
-      // TODO: Implement registration logic
-      console.log(data);
-    } finally {
-      setLoading(false);
+  const { login: setAuthUser } = useAuth();
+
+  /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
+  const { execute: registerUser, isLoading: loading } = useAsyncFetch<AuthResponse>(
+    async () => {
+        const values = getValues();
+        return await authService.register(values);
+    },
+    {
+      immediate: false,
+      onSuccess: (response: AuthResponse) => {
+        setAuthUser(response.data!);
+        toast.success("Registrasi berhasil! Selamat datang.");
+
+        if (response.data?.user.role === 'admin') {
+            navigate("/dashboard");
+        } else {
+            navigate("/");
+        }
+      },
+      onError: (error: unknown) => {
+        const err = error as Error;
+        toast.error(err.message || "Gagal registrasi. Silakan coba lagi.");
+      },
     }
+  );
+
+  const onSubmit = async () => {
+    await registerUser();
   };
 
   return (

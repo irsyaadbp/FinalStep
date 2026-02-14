@@ -1,6 +1,5 @@
 import { motion } from "motion/react";
 import { GraduationCap, Mail, Lock } from "lucide-react";
-import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { loginSchema, type LoginInput } from "@finalstep/shared";
@@ -9,7 +8,12 @@ import {
   type FormField,
 } from "../../components/common/FormGenerator";
 import { Button } from "../../components/ui/Button";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
+import { useAsyncFetch } from "../../hooks/useAsyncFetch";
+import { authService } from "../../service/auth";
+import { type AuthResponse } from "@finalstep/shared";
+import { toast } from "sonner";
+import { useAuth } from "../../context/AuthContext";
 
 const fields: FormField<LoginInput>[] = [
   {
@@ -31,11 +35,13 @@ const fields: FormField<LoginInput>[] = [
 ];
 
 export default function LoginPage() {
-  const [loading, setLoading] = useState(false);
-
+  const navigate = useNavigate();
+  const { login: setAuthUser } = useAuth();
+  
   const {
     register,
     handleSubmit,
+    getValues,
     formState: { errors },
   } = useForm({
     resolver: zodResolver(loginSchema),
@@ -44,15 +50,33 @@ export default function LoginPage() {
       password: "",
     },
   });
+  /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
+  const { execute: login, isLoading: loading } = useAsyncFetch<AuthResponse>(
+    async () => {
+        const values = getValues();
+        return await authService.login(values);
+    },
+    {
+      immediate: false,
+      onSuccess: (response: AuthResponse) => {
+        setAuthUser(response.data!);
+        toast.success("Login berhasil! Selamat datang kembali.");
 
-  const onSubmit = async (data: LoginInput) => {
-    setLoading(true);
-    try {
-      // TODO: Implement login logic
-      console.log(data);
-    } finally {
-      setLoading(false);
+        if (response.data?.user.role === 'admin') {
+            navigate("/dashboard");
+        } else {
+            navigate("/");
+        }
+      },
+      onError: (error: unknown) => {
+        const err = error as Error;
+        toast.error(err.message || "Gagal login. Silakan coba lagi.");
+      },
     }
+  );
+
+  const onSubmit = async () => {
+    await login();
   };
 
   return (

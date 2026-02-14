@@ -1,19 +1,27 @@
-
 import { Navigate } from "react-router";
+import { useAuth } from "../../context/AuthContext";
 
-// Mock Auth Check - In a real app, this would use a context or hook
-const isAuthenticated = () => {
-    // Replace with real auth check
-    return true; 
-};
+export default function ProtectedRoute({ children, allowedRoles }: { children: React.ReactNode, allowedRoles?: ('student' | 'admin')[] }) {
+    const { isAuthenticated, isLoading, user } = useAuth();
 
-interface ProtectedRouteProps {
-    children: React.ReactNode;
-}
+    if (isLoading) {
+        return (
+            <div className="flex h-screen items-center justify-center">
+                <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+            </div>
+        );
+    }
 
-export default function ProtectedRoute({ children }: ProtectedRouteProps) {
-    if (!isAuthenticated()) {
+    if (!isAuthenticated) {
         return <Navigate to="/login" replace />;
     }
+
+    if (allowedRoles && user && !allowedRoles.includes(user.role)) {
+        if (user.role === 'admin') {
+            return <Navigate to="/dashboard" replace />;
+        }
+        return <Navigate to="/" replace />;
+    }
+
     return <>{children}</>;
 }

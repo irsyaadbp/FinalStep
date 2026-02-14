@@ -4,6 +4,7 @@ import AuthLayout from "./components/layouts/AuthLayout";
 import AppLayout from "./components/layouts/AppLayout";
 import DashboardLayout from "./components/layouts/DashboardLayout";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
+import GuestRoute from "./components/auth/GuestRoute";
 
 // Auth Pages
 import LoginPage from "./pages/auth/LoginPage";
@@ -24,24 +25,34 @@ import DashboardQuizzesPage from "./pages/dashboard/subjects/quizzes/QuizzesPage
 import StudentsPage from "./pages/dashboard/students/StudentsPage";
 import SettingsPage from "./pages/dashboard/settings/SettingsPage";
 
+import { AuthProvider } from "./context/AuthContext";
+
 export const router = createBrowserRouter([
   {
     path: "/",
-    element: <RootLayout />,
+    element: (
+      <AuthProvider>
+        <RootLayout />
+      </AuthProvider>
+    ),
     children: [
-      // Auth Routes (Public)
       {
-        element: <AuthLayout />,
+        element: <GuestRoute />,
         children: [
-          { path: "login", element: <LoginPage /> },
-          { path: "register", element: <RegisterPage /> },
+          {
+            element: <AuthLayout />,
+            children: [
+              { path: "login", element: <LoginPage /> },
+              { path: "register", element: <RegisterPage /> },
+            ],
+          },
         ],
       },
 
-      // App Routes (Protected)
       {
+        path: "/",
         element: (
-          <ProtectedRoute>
+          <ProtectedRoute allowedRoles={["student"]}>
             <AppLayout />
           </ProtectedRoute>
         ),
@@ -52,24 +63,19 @@ export const router = createBrowserRouter([
           { path: "profile", element: <AppProfilePage /> },
         ],
       },
-
-      // Standalone Material Route (Full Page)
-      // This handles both Chapters (reading/quiz) and Final Exams
       {
         path: "subjects/:slug/material/:materialId",
         element: (
-          <ProtectedRoute>
+          <ProtectedRoute allowedRoles={["student"]}>
             <AppSubjectMaterialPage />
           </ProtectedRoute>
         ),
       },
 
-
-      // Dashboard Routes (Protected)
       {
         path: "dashboard",
         element: (
-          <ProtectedRoute>
+          <ProtectedRoute allowedRoles={["admin"]}>
             <DashboardLayout />
           </ProtectedRoute>
         ),
