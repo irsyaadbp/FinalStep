@@ -12,23 +12,32 @@ import {
 import { Badge } from "@/components/ui/Badge";
 import { Avatar, AvatarFallback } from "@/components/ui/Avatar";
 import { Button } from "@/components/ui/Button";
-import { Flame, Star, GraduationCap, ChevronLeft, ChevronRight } from "lucide-react";
+import {
+  Flame,
+  Star,
+  GraduationCap,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
 
 const ITEMS_PER_PAGE = 5;
 
 export default function StudentsPage() {
   const [currentPage, setCurrentPage] = useState(1);
-  
+
   const totalPages = Math.ceil(students.length / ITEMS_PER_PAGE);
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-  const paginatedStudents = students.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+  const paginatedStudents = students.slice(
+    startIndex,
+    startIndex + ITEMS_PER_PAGE,
+  );
 
   const goToNextPage = () => {
-    if (currentPage < totalPages) setCurrentPage(prev => prev + 1);
+    if (currentPage < totalPages) setCurrentPage((prev) => prev + 1);
   };
 
   const goToPrevPage = () => {
-    if (currentPage > 1) setCurrentPage(prev => prev - 1);
+    if (currentPage > 1) setCurrentPage((prev) => prev - 1);
   };
 
   return (
@@ -172,30 +181,30 @@ export default function StudentsPage() {
       {/* Pagination Controls */}
       <div className="flex items-center justify-between py-2 px-1">
         <p className="text-sm text-muted-foreground">
-          Menampilkan <span className="font-medium">{startIndex + 1}</span> - <span className="font-medium">{Math.min(startIndex + ITEMS_PER_PAGE, students.length)}</span> dari <span className="font-medium">{students.length}</span> siswa
+          Menampilkan <span className="font-medium">{startIndex + 1}</span> -{" "}
+          <span className="font-medium">
+            {Math.min(startIndex + ITEMS_PER_PAGE, students.length)}
+          </span>{" "}
+          dari <span className="font-medium">{students.length}</span> siswa
         </p>
         <div className="flex items-center gap-2">
           <Button
             variant="outline"
-            size="sm"
+            size="icon"
             onClick={goToPrevPage}
             disabled={currentPage === 1}
-            className="h-8 px-2"
           >
             <ChevronLeft className="h-4 w-4 mr-1" />
-            Sebelumnya
           </Button>
           <div className="flex items-center justify-center min-w-8 h-8 text-sm font-medium">
             {currentPage} / {totalPages}
           </div>
           <Button
             variant="outline"
-            size="sm"
+            size="icon"
             onClick={goToNextPage}
             disabled={currentPage === totalPages}
-            className="h-8 px-2"
           >
-            Berikutnya
             <ChevronRight className="h-4 w-4 ml-1" />
           </Button>
         </div>

@@ -95,7 +95,7 @@ export default function AdminQuizzes() {
   const onSubmit = (data: QuizFormValues) => {
     if (editing) {
       setLocalQuizzes(localQuizzes.map(q => q.id === editing.id ? { ...q, title: data.title, questions: data.questions } : q));
-      toast({ title: 'Quiz diperbarui' });
+      toast({ title: 'Quiz diperbarui', variant: 'success' });
     } else {
       const newQuiz: Quiz = {
         id: `quiz-${Date.now()}`,
@@ -105,7 +105,7 @@ export default function AdminQuizzes() {
         questions: data.questions,
       };
       setLocalQuizzes([...localQuizzes, newQuiz]);
-      toast({ title: 'Quiz ditambahkan' });
+      toast({ title: 'Quiz ditambahkan', variant: 'success' });
     }
     setDialogOpen(false);
   };
@@ -113,7 +113,7 @@ export default function AdminQuizzes() {
   const handleDelete = (id: string) => {
     setLocalQuizzes(localQuizzes.filter(q => q.id !== id));
     setDeleteConfirm(null);
-    toast({ title: 'Quiz dihapus' });
+    toast({ title: 'Quiz dihapus', variant: 'success' });
   };
 
   const watchQuestions = watch('questions');

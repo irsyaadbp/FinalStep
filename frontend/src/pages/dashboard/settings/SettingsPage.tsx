@@ -29,6 +29,7 @@ const SettingsPage = () => {
     toast({
       title: 'Pengaturan disimpan',
       description: 'Konfigurasi berhasil diperbarui.',
+      variant: 'success',
     });
   };
 

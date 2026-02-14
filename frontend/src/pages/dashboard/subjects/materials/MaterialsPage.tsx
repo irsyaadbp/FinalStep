@@ -328,7 +328,7 @@ export default function MaterialsPage() {
   const handleSaveChapter = (data: ChapterFormValues) => {
     if (editing) {
       updateChapter(editing.id, { title: data.title, content: data.content });
-      toast({ title: "Materi diperbarui" });
+      toast({ title: "Materi diperbarui", variant: "success", });
     } else {
       const dateNow = new Date().getTime();
       const id = `${subjectId}-${dateNow.toString(36)}`;
@@ -342,7 +342,7 @@ export default function MaterialsPage() {
         completed: false,
         order: subjectChapters.length + 1,
       });
-      toast({ title: "Materi ditambahkan" });
+      toast({ title: "Materi ditambahkan", variant: 'success' });
     }
     setDialogOpen(false);
   };
@@ -350,7 +350,7 @@ export default function MaterialsPage() {
   const handleDelete = (id: string) => {
     deleteChapter(id);
     setDeleteConfirm(null);
-    toast({ title: "Materi dihapus" });
+    toast({ title: "Materi dihapus", variant: 'success' });
   };
 
   // Final exam handlers
@@ -379,7 +379,7 @@ export default function MaterialsPage() {
         title: data.title,
         questions: data.questions,
       });
-      toast({ title: "Ujian Akhir diperbarui" });
+      toast({ title: "Ujian Akhir diperbarui", variant: 'success' });
     } else {
       addFinalExam({
         id: `final-${subjectId}`,
@@ -388,7 +388,7 @@ export default function MaterialsPage() {
         questions: data.questions,
         passed: false,
       });
-      toast({ title: "Ujian Akhir ditambahkan" });
+      toast({ title: "Ujian Akhir ditambahkan", variant: 'success' });
     }
     setExamDialogOpen(false);
   };
@@ -396,7 +396,7 @@ export default function MaterialsPage() {
   const handleDeleteExam = () => {
     deleteFinalExam(subjectId!);
     setDeleteExamConfirm(false);
-    toast({ title: "Ujian Akhir dihapus" });
+    toast({ title: "Ujian Akhir dihapus", variant: 'success' });
   };
 
   return (

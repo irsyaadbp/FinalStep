@@ -128,7 +128,7 @@ export default function SubjectsPage() {
         icon: data.icon,
         color: data.color,
       });
-      toast({ title: "Pelajaran diperbarui" });
+      toast({ title: "Pelajaran diperbarui", variant: 'success' });
     } else {
       const slug = data.title.toLowerCase().replace(/\s+/g, "-");
       const id = slug + "-" + Math.random().toString(36).substring(2, 9);
@@ -142,7 +142,7 @@ export default function SubjectsPage() {
         totalChapters: 0,
         completedChapters: 0,
       });
-      toast({ title: "Pelajaran ditambahkan" });
+      toast({ title: "Pelajaran ditambahkan", variant: 'success' });
     }
     setDialogOpen(false);
   };
@@ -154,7 +154,7 @@ export default function SubjectsPage() {
   const handleDelete = (id: string | number) => {
     deleteSubject(id);
     setDeleteConfirm(null);
-    toast({ title: "Pelajaran dihapus" });
+    toast({ title: "Pelajaran dihapus", variant: 'success' });
   };
   return (
     <div className="space-y-6">
