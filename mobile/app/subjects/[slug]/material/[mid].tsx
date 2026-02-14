@@ -5,7 +5,8 @@ import { Text } from '@/components/ui/text';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { ChevronLeft, ClipboardList, Trophy, Play } from 'lucide-react-native';
 import * as React from 'react';
-import { ScrollView, View, SafeAreaView, ActivityIndicator } from 'react-native';
+import { ScrollView, View, SafeAreaView, ActivityIndicator, useWindowDimensions } from 'react-native';
+import RenderHtml from 'react-native-render-html';
 
 import { useAsyncFetch } from '@/hooks/useAsyncFetch';
 import { chapterService } from '@/services/chapter';
@@ -18,12 +19,87 @@ import { QuizView } from '@/components/learning/QuizView';
 import { FinalExamView } from '@/components/learning/FinalExamView';
 import { quizService } from '@/services/quiz';
 
+// Define styles for HTML elements outside relevant to avoid recreation
+const tagsStyles = {
+  body: {
+    color: '#334155', // slate-700
+    fontSize: 16,
+    lineHeight: 24,
+  },
+  p: {
+    marginBottom: 12,
+  },
+  h1: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 12,
+    marginTop: 12,
+    color: '#0f172a', // slate-900
+  },
+  h2: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 8,
+    marginTop: 12,
+    color: '#0f172a', // slate-900
+  },
+  h3: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 8,
+    marginTop: 8,
+    color: '#0f172a', // slate-900
+  },
+  ul: {
+    marginLeft: 0,
+    marginBottom: 12,
+    paddingLeft: 20,
+  },
+  ol: {
+    marginLeft: 0,
+    marginBottom: 12,
+    paddingLeft: 20,
+  },
+  li: {
+    marginBottom: 4,
+  },
+  strong: {
+    fontWeight: 'bold',
+    color: '#0f172a', // slate-900
+  },
+  a: {
+    color: '#4f46e5', // indigo-600
+    textDecorationLine: 'underline',
+  },
+  img: {
+    borderRadius: 8,
+    marginVertical: 12,
+  },
+  pre: {
+    backgroundColor: '#f1f5f9', // slate-100
+    padding: 12,
+    borderRadius: 8,
+    marginBottom: 12,
+    fontFamily: 'monospace',
+  },
+  code: {
+    backgroundColor: '#f1f5f9', // slate-100
+    paddingHorizontal: 4,
+    paddingVertical: 2,
+    borderRadius: 4,
+    fontFamily: 'monospace',
+    fontSize: 14,
+    color: '#ef4444', // red-500
+  },
+};
+
 export default function MaterialScreen() {
   const router = useRouter();
   const params = useLocalSearchParams();
   const slug = params.slug as string; // subject slug
   const mid = params.mid as string; // material id or chapter slug
   const { user, refreshUser } = useAuth();
+  const { width } = useWindowDimensions();
 
   const [viewMode, setViewMode] = React.useState<'reading' | 'quiz' | 'exam' | 'complete'>(
     'reading'
@@ -143,6 +219,9 @@ export default function MaterialScreen() {
       setViewMode('complete');
     }
   };
+
+
+
 
   const handleFinishReading = async () => {
     if (type === 'chapter') {
@@ -296,12 +375,19 @@ export default function MaterialScreen() {
           contentContainerStyle={{ paddingBottom: 120, paddingHorizontal: 24 }}
           showsVerticalScrollIndicator={false}>
           {/* Content Card */}
-          <Card contentClassName="p-8">
-            <Text className="mb-6 text-lg leading-relaxed text-slate-600">
-              {type === 'chapter'
-                ? (content as Chapter).content || 'Tidak ada konten untuk materi ini.'
-                : 'Selamat! Kamu telah menyelesaikan semua bab. Sekarang saatnya menguji kemampuanmu di Ujian Akhir untuk mendapatkan sertifikat dan XP tambahan!'}
-            </Text>
+          <Card contentClassName="p-4">
+            {type === 'chapter' ? (
+              <RenderHtml
+                contentWidth={width - 80} // Adjust for card padding (24 padding horizontal * 2 + card padding)
+                source={{ html: (content as Chapter).content || '<p>Tidak ada konten.</p>' }}
+                tagsStyles={tagsStyles as any}
+                systemFonts={['Inter', 'System']} // Add your app's custom fonts here if needed
+              />
+            ) : (
+              <Text className="mb-6 text-lg leading-relaxed text-slate-600">
+                Selamat! Kamu telah menyelesaikan semua bab. Sekarang saatnya menguji kemampuanmu di Ujian Akhir untuk mendapatkan sertifikat dan XP tambahan!
+              </Text>
+            )}
           </Card>
         </ScrollView>
 
